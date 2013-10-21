@@ -35,7 +35,8 @@ public class SendPackHelloETX extends Timer {
 	@Override
 	public void fire() {
 		// TODO Auto-generated method stub
-		((NodeETX)this.node).triggersMsg(this.pkt);
+		//((NodeETX)this.node).triggersMsg(this.pkt);
+		((NodeETX)this.node).fwdHelloPack(this.pkt);
 	}
 
 	public PackHelloETX getPkt() {

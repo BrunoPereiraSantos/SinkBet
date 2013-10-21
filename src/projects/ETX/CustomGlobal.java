@@ -40,7 +40,9 @@ package projects.ETX;
 import java.awt.Color;
 import java.util.Iterator;
 import java.util.Vector;
+
 import javax.swing.JOptionPane;
+
 import projects.ETX.nodes.edges.EdgeWeightETX;
 import projects.ETX.nodes.nodeImplementations.NodeETX;
 import projects.ETX.nodes.nodeImplementations.NodeRoleETX;
@@ -51,6 +53,7 @@ import sinalgo.runtime.AbstractCustomGlobal;
 import sinalgo.runtime.Global;
 import sinalgo.runtime.Runtime;
 import sinalgo.tools.Tools;
+import sinalgo.tools.logging.Logging;
 
 /**
  * This class holds customized global state and methods for the framework. 
@@ -74,6 +77,96 @@ import sinalgo.tools.Tools;
  * added to the GUI. 
  */
 public class CustomGlobal extends AbstractCustomGlobal{
+	
+	private Logging myLogETX;
+	
+	public void preRun() {
+		// colocar true como segundo parametro (append) quando for rodar mais simulacoes
+		// usa o arquivo que está no config.xml
+		myLogETX = Logging.getLogger("logETX.txt", true);	// false caso for ler estes valores pelo CTDistribuido
+		
+	}
+	
+	public void onExit() {
+		int numberOfNodes = Tools.getNodeList().size();
+		String str = "";
+		NodeETX n = (NodeETX) Tools.getNodeByID(1);
+		int numberOfPktRcvSink = n.getCount_rcv_ev_sink();
+		
+		str += "N=" + numberOfNodes;
+		str += " rcvSink="+numberOfPktRcvSink;
+		str += " allPkt="+NodeETX.getCount_all_pkt_sent();
+		str += " AllpktEv=" + NodeETX.getCount_all_ev_sent();
+		str += " intervalAggr=" + NodeETX.getIntervalAggr();
+		str += " ev=" + NodeETX.getEv();
+		str += " nNodesEv=" + NodeETX.getnNodesEv();
+		str += " NumberNodes=" + NodeETX.getNumberNodes();
+		
+		myLogETX.logln(str);
+		
+		
+//		ArrayList<Integer> listPackSent = new ArrayList<Integer>();
+//		ArrayList<Integer> listPackLost = new ArrayList<Integer>();
+//		
+//		for(int i = 1; i <= numberOfNodes; i++){
+//			str = "";
+//			n = (NodeHopSbet) Tools.getNodeByID(i);
+//			ArrayList<Integer> a = new ArrayList<Integer>(n.getSonsPathMap().values());
+//			str += "ID=" + i + "; ";
+//			str += "Hops=" + n.getHops() + "; ";
+//			if(i != 1) str += "nHop=" + n.getNextHop() + "; "; else str += "nHop=" + 0 + "; ";
+//			str += "lostPackts=" + n.getTotalLostPacktetsByMe() + "; ";
+//			listPackLost.add(n.getTotalLostPacktetsByMe());
+//			str += "sentPackts=" + n.getTotalSentByMe() + "; ";
+//			listPackSent.add(n.getTotalSentByMe());
+//			str += "sBet=" + n.getsBet() + "; ";
+//			str += "a.size()=" + a.size() + "; ";
+//			str += "sons.size()=" + n.getSons().size() + "; \n";
+//			myLogHopSbet.logln(str);
+//			if(n.getRole() == NodeRoleHopSbet.BORDER)
+//				numberOfBordes++;			
+//		}
+//		
+//		myLogHopSbet.logln("numberOfBordes=" + numberOfBordes);
+//		myLogHopSbet.logln("numberOfRelay=" + (numberOfNodes - numberOfBordes - 1) + "\n\n");
+//		
+//		myLogHopSbet.logln("TotalPacktesSent=" + NodeHopSbet.getTotalPacktesSent());
+//		myLogHopSbet.logln("media de pkt send=" + m.mean(listPackSent));
+//		myLogHopSbet.logln("sd de pkt send=" + m.sd(listPackSent));
+//		myLogHopSbet.logln("var de pkt send=" + m.var(listPackSent)+ "\n\n");
+//
+//		myLogHopSbet.logln("TotalLostPackets=" + NodeHopSbet.getTotalLostPackets());
+//		myLogHopSbet.logln("media de pkt lost=" + m.mean(listPackLost));
+//		myLogHopSbet.logln("sd de pkt lost=" + m.sd(listPackLost));
+//		myLogHopSbet.logln("var de pkt lost=" + m.var(listPackLost)+ "\n\n");
+			
+//		for (int i = 1; i <= numberOfNodes; i++) {
+//			NodeHopSbet n = (NodeHopSbet) Tools.getNodeByID(i);
+//			if (n.getHops() >= 0) {
+//				List<Integer> a = new ArrayList<Integer>(n.getSonsPathMap().values());
+//				if(a.size() > 0){
+//					methods m = new methods();
+//					
+//					myLogHopSbet.logln(Integer.toString(Tools.getNodeList().size()) + "\t" +
+//								Integer.toString(i) + " \t" +
+//								Integer.toString(n.getHops()) + "\t" +
+//								Integer.toString(a.size()) + "\t" +
+//								Integer.toString(Collections.min(a)) + "\t" +
+//								Double.toString(m.median(a)) + "\t" +
+//								Double.toString(m.mean(a)) + "\t" +
+//								Integer.toString(Collections.max(a)) + "\t" +
+//								/*Double.toString(m.sd(a))*/
+//								Integer.toString(NodeHopSbet.getTotalLostPackets()) + "\t" +
+//								Integer.toString(n.getTotalSentByMe()) + "\t" +
+//								Integer.toString(NodeHopSbet.getTotalPacktesSent()));
+//				}else{
+//					myLogHopSbet.logln(Integer.toString(NodeHopSbet.getTotalLostPackets()) + "\t" +
+//										Integer.toString(n.getTotalSentByMe()) + "\t" +
+//										Integer.toString(NodeHopSbet.getTotalPacktesSent()));
+//				}
+//			}
+//		}
+	}
 	
 	/* (non-Javadoc)
 	 * @see runtime.AbstractCustomGlobal#hasTerminated()

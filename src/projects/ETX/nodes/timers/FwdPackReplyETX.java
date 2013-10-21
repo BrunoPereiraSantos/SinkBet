@@ -4,13 +4,13 @@ import projects.ETX.nodes.messages.PackReplyETX;
 import projects.ETX.nodes.nodeImplementations.NodeETX;
 import sinalgo.nodes.timers.Timer;
 
-public class SendPackReplyETX extends Timer {
+public class FwdPackReplyETX extends Timer {
 	
 	private PackReplyETX pkt;
 	
-	public SendPackReplyETX() {}
+	public FwdPackReplyETX() {}
 	
-	public SendPackReplyETX(PackReplyETX msg) {
+	public FwdPackReplyETX(PackReplyETX msg) {
 		//super();
 		this.pkt = msg;
 		pkt.setHops(msg.getHops());
@@ -22,7 +22,7 @@ public class SendPackReplyETX extends Timer {
 		pkt.setFwdID(msg.getFwdID());
 	}
 	
-	public SendPackReplyETX(int hops, int path, int senderID, int sinkID, int sendTo, double ETX, double sBet, int fwdID) {
+	public FwdPackReplyETX(int hops, int path, int senderID, int sinkID, int sendTo, double ETX, double sBet, int fwdID) {
 		//super();
 		//this.pkt = pkt;
 		pkt = new PackReplyETX(hops, path, senderID, sinkID, sendTo, ETX, sBet, fwdID);
@@ -30,7 +30,7 @@ public class SendPackReplyETX extends Timer {
 	@Override
 	public void fire() {
 		// TODO Auto-generated method stub
-		((NodeETX)this.node).triggersMsg(this.pkt);
+		((NodeETX)this.node).fwdReply(this.pkt);
 	}
 
 	public PackReplyETX getPkt() {

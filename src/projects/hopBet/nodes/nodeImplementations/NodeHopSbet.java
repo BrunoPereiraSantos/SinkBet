@@ -59,7 +59,7 @@ public class NodeHopSbet extends Node {
 	//Flag para indicar se o nodo ja enviou seu pkt hello
 	private boolean sentMyHello;
 	
-	//Flag para indicar se o nodo ja enviou seu pkt border
+	//Flag para indicar se o nodo ja enviou seu pkt reply
 	private boolean sentMyReply;
 	
 	//Flag para indicar se o nodo esta em periodo de agregacao
@@ -173,7 +173,7 @@ public class NodeHopSbet extends Node {
 	}
 	
 	public void fwdHelloPack() {
-		// Encaminha um pacote com as informa�oes atualizadas
+		// Encaminha um pacote com as informacoes atualizadas
 		broadcast(new PackHelloHopSbet(hops, pathsToSink, this.ID, sinkID)); 
 		setSentMyHello(true);
 		
@@ -386,7 +386,7 @@ public class NodeHopSbet extends Node {
 			readConfigurationParameters();
 		}
 		
-		if(setNodesEv.contains(this.ID)){
+		/*if(setNodesEv.contains(this.ID)){
 			StartEvent se = new StartEvent();
 			int time = gerador.nextInt(1000) + 2020;
 			System.out.println(this.ID+" emitiriar evento em: "+time);
@@ -399,7 +399,7 @@ public class NodeHopSbet extends Node {
 				se.startRelative(time+i, this);
 				
 			}
-		}
+		}*/
 		
 	}
 	
