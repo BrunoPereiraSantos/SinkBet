@@ -30,7 +30,7 @@ import sinalgo.tools.Tools;
 
 public class NodeHopSbet extends Node {
 
-	// Qual o papel do nodo
+	// Qual o papel do nodo.
 	private NodeRoleHopSbet role;
 	
 	//private int sonsPath[];
