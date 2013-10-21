@@ -1,0 +1,406 @@
+//package projects.hopBet.nodes.nodeImplementations;
+//
+//import java.awt.Color;
+//import java.awt.Graphics;
+//import java.util.ArrayList;
+//import java.util.HashMap;
+//import java.util.Map;
+//import java.util.Map.Entry;
+//import projects.hopBet.nodes.messages.Pack;
+//import projects.hopBet.nodes.messages.PackHelloHopSbet;
+//import projects.hopBet.nodes.messages.PackReplyHopSbet;
+//import projects.hopBet.nodes.messages.PackSbetHopSbet;
+//import projects.hopBet.nodes.timers.SendPackHelloHopSbet;
+//import projects.hopBet.nodes.timers.SendPackReplyHopSbet;
+//import projects.hopBet.nodes.timers.SendPackSBetHopSbet;
+//import projects.hopBet.nodes.timers.StartBorderFloodingHopSbet;
+//import sinalgo.configuration.WrongConfigurationException;
+//import sinalgo.gui.transformation.PositionTransformation;
+//import sinalgo.nodes.Node;
+//import sinalgo.nodes.messages.Inbox;
+//import sinalgo.nodes.messages.Message;
+//
+//public class NodeHopSbet extends Node {
+//
+//	// Qual o papel do nodo
+//	private NodeRoleHopSbet role;
+//	
+//	//private int sonsPath[];
+//	//cada nodo mantem um map com chave(num de caminhos) e valor(quantos nodos descendentes tem 'num de caminhos'
+//	private Map<Integer, Integer> sonsPathMap;	
+//	
+//	//numero de caminhos para o sink
+//	private int pathsToSink;	
+//	
+//	//numero de hops ate o sink
+//	private int hops;			
+//	
+//	//id do prox no usando a metrica numero de hops
+//	private int nextHop;		
+//	
+//	//valor do Sink Betweenness
+//	private double sBet;		
+//	
+//	//Valor do maior sBet entre os vizinhos diretos
+//	private double neighborMaxSBet;	
+//	//private double timeRcv;
+//	
+//	//Flag para indicar se o nodo ja enviou seu pkt hello
+//	private Boolean firstHello;	
+//	
+//	//Flag para indicar se o nodo ja enviou seu pkt border
+//	private Boolean firstBorder;
+//	
+//	//array com os filhos (nodo.hops < hops)
+//	private ArrayList<Integer> sons;	
+//	
+//	//array com os vizinhos diretos do nodo.
+//	private ArrayList<Integer> neighbors;	
+//	
+//	@Override
+//	public void handleMessages(Inbox inbox) {
+//		while (inbox.hasNext()) {
+//			Message msg = inbox.next();
+//			
+//			if (msg instanceof PackHelloHopSbet) {
+//				PackHelloHopSbet a = (PackHelloHopSbet) msg;
+//				handlePackHello(a);
+//			}else if (msg instanceof PackReplyHopSbet) {
+//				PackReplyHopSbet b = (PackReplyHopSbet) msg;
+//				handlePackReply(b);
+//			} else if (msg instanceof PackSbetHopSbet) {
+//				PackSbetHopSbet c = (PackSbetHopSbet) msg;
+//				handlePackSbet(c);
+//			}
+//		}
+//	}
+//	
+//	public void handlePackHello(PackHelloHopSbet message) {
+//		// no sink nao manipula pacotes hello
+//		if (message.getSinkID() == this.ID){
+//			message = null;	//drop message
+//			return;
+//		}
+//	
+//		// o nodo e vizinho direto do sink (armazena o nextHop como id do sink
+//		if (message.getSenderID() == message.getSinkID()) {	
+//			setNextHop(message.getSinkID());
+//			setNeighborMaxSBet(Double.MAX_VALUE);
+//		}
+//
+//		// nodo acaba de ser descoberto ou acabou de encontrar um caminho mais curto
+//		if ((message.getHops() + 1 < getHops()) || (getHops() == 0)) {	
+//			this.setColor(Color.RED);
+//			setHops(message.getHops() + 1);
+//			message.setHops(getHops());
+//			setPathsToSink(message.getPath());
+//			
+//			// VERIFICAR se nao e preciso remover esse cara daqui
+//			setNextHop(message.getSenderID());
+//		}
+//
+//		//existe mais de um caminho deste nodo ate o sink com a mesma quantidade de hops
+//		if ((message.getHops() + 1 == getHops())) {	
+//			this.setColor(Color.MAGENTA);
+//			setPathsToSink(getPathsToSink() + message.getPath());
+//			message.setHops(getHops());
+//
+//			// somente eh necessario re-encaminhar o pacote a primeira fez
+//			// que se recebe um pacote do tipo HELLO ou quando existe mais
+//			// de um caminho pelo no t.
+//			setFirstHello(false);
+//		}
+//
+//		// Em nodos RELAY nao e necessario reencaminhar pacotes
+//		if ((message.getHops() > hops) || (getRole() == NodeRoleHopSbet.RELAY)) {
+//			this.setColor(Color.CYAN);
+//			setRole(NodeRoleHopSbet.RELAY);
+//			
+//			//Pack pkt = new Pack(hops, pathsToSink, this.ID, 1, sBet, TypeMessage.REPLY);
+//			//FwdPack fpr = new FwdPack(pkt);
+//			//fpr.startRelative((double)hops, this);
+//			
+//			//SendPackReplyHopSbet fpr = new SendPackReplyHopSbet(hops, pathsToSink, this.ID, 1);
+//			//fpr.startRelative((double)hops, this);
+//			
+//			setFirstHello(true);
+//			return;
+//		}
+//
+///*		// somente eh necessario re-encaminhar o pacote a primeira fez que
+//		// se recebe um pacote do tipo HELLO ou quando existe mais de um
+//		// caminho pelo no t.
+//		if (!firstHello) {
+//			timeRcv = Global.currentTime + this.hops;
+//			this.firstHello = true;
+//			forwardPackHello(message);
+//			// sendBorder();
+//		}*/
+//		
+//		// eh a primeira vez que o nodo recebe um hello
+//		// ele deve encaminhar um pacote com seus dados
+//		if(!getFirstHello()){
+//			//FwdPack fhp = new FwdPack(message, this.ID);
+//			SendPackHelloHopSbet fhp = new SendPackHelloHopSbet(message, this.ID);
+//			fhp.startRelative(getHops(), this);
+//			setFirstHello(true);
+//			
+//			// Dispara um timer para enviar um pacote de borda
+//			// para calculo do sbet
+//			// nodos do tipo border e relay devem enviar tal pacote
+//			if(!getFirstBorder()){
+//				StartBorderFloodingHopSbet sbf = new StartBorderFloodingHopSbet();
+//				sbf.startRelative((double) waitingTime(), this);
+//				setFirstBorder(true);
+//			}
+//		}else{
+//			message = null;	//drop message
+//		}
+//	}
+//	
+//	public double waitingTime () {//atraso para enviar o pacote [referencia artigo do Eduardo]
+//		double waitTime = 0.0;
+//		waitTime = 1 / (Math.exp(this.hops) * Math.pow(10, -20));
+//		return waitTime;
+//	}
+//	
+//	public void sendBorderFlooding(){ //Dispara o flooding das respostas dos nodos com papel BORDER
+//		if((getRole() == NodeRoleHopSbet.BORDER) && (!getFirstBorder())){
+//			this.setColor(Color.GRAY);
+//			//Pack pkt = new Pack(this.hops, this.pathsToSink, this.ID, 1, this.sBet, TypeMessage.BORDER);
+//			PackReplyHopSbet pkt = new PackReplyHopSbet(hops, pathsToSink, this.ID, 1);
+//			broadcast(pkt);
+//			
+//			setFirstBorder(true);
+//		}
+//		/*if ((getRole() == NodeRoleHopSbet.BORDER) || 
+//			(getRole() == NodeRoleHopSbet.RELAY)) {
+//			this.setColor(Color.GRAY);
+//			//Pack pkt = new Pack(this.hops, this.pathsToSink, this.ID, 1, this.sBet, TypeMessage.BORDER);
+//			PackReplyHopSbet pkt = new PackReplyHopSbet(hops, pathsToSink, this.ID, 1);
+//			broadcast(pkt);
+//			
+//			setFirstBorder(true);
+//		}*/
+//	}
+//	
+//	public void fwdHelloFlooding(Pack pkt){
+//		broadcast(pkt);
+//	}
+//	
+//	public void triggersMsg(Message pkt){	//Dispara um broadcast com o pacote Gernerico | metodo utilizado pelos timers
+//		broadcast(pkt);
+//	}
+//	
+//	public void triggersMsg(PackReplyHopSbet pkt){//Dispara um broadcast com o pacote PackReplyHopSbet | metodo utilizado pelos timers
+//		broadcast(pkt);
+//	}
+//	
+//	public void triggersMsg(PackSbetHopSbet pkt){//Dispara um broadcast com o pacote PackSbetHopSbet | metodo utilizado pelos timers
+//		broadcast(pkt);
+//	}
+//	
+//	public void handlePackSbet(PackSbetHopSbet message) {
+//		// No fonte nao devem manipular pacotes do tipo Relay
+//		if ((message.getSinkID() == this.ID)){	message = null; 	return;	}
+//
+//		// Uma mensagem foi recebida pelos ancestrais logo devo analisar se e o meu nextHop
+//		if (message.getHops() < getHops()){	
+//			if (message.getsBet() > getNeighborMaxSBet()) {
+//				setNeighborMaxSBet(message.getsBet());
+//				setNextHop(message.getSenderID());
+//			}
+//		}else{
+//			message = null; // drop o pacote
+//		}
+//	}
+//
+//	public void handlePackReply(PackReplyHopSbet message) {
+//		// o border e fonte nao devem manipular pacotes do tipo Relay
+//		if ((message.getSinkID() == this.ID) || (getRole() == NodeRoleHopSbet.BORDER))	return;
+//		
+//		// necessaria verificacao de que o no ja recebeu menssagem de um determinado descendente, isso e feito para evitar mensagens duplicadas.
+//		if (!sons.contains(message.getSenderID()) && 
+//			(message.getHops() > getHops())) { // Se o nodo ainda nao recebeu menssagem de um descendente ele deve 'processar' (recalcular o sbet) e propagar o pacote desse descendente
+//			sons.add(message.getSenderID());
+//
+//			processBet(message);
+//		
+//			SendPackReplyHopSbet pktReply = new SendPackReplyHopSbet(message);
+//			pktReply.startRelative(0.1, this);
+//			
+//			SendPackSBetHopSbet pktSBet = new SendPackSBetHopSbet(hops, this.ID, 1, sBet);
+//			pktSBet.startRelative(0.1, this);
+//				
+//		}else{
+//			message = null;
+//		}
+//		/*
+//		// o border e fonte nao devem manipular pacotes do tipo Relay
+//		if ((message.getSinkID() == this.ID) || (getRole() == NodeRoleHopSbet.BORDER))	return;
+//		
+//		// necessaria verificacao de que o no ja recebeu menssagem 
+//		// de um determinado descendente, isso e feito para evitar mensagens duplicadas.
+//		// Se o nodo ainda nao recebeu menssagem de um descendente 
+//		// ele deve 'processar' (recalcular o sbet) e propagar o pacote desse descendente
+//		// para que os outros nodos tambem calculem seu sBet
+//		if (!sons.contains(message.getSenderID()) && 
+//			(message.getHops() > getHops())		  //&& 
+//			//(message.getSendTo() == this.ID)) { 
+//			){
+//			sons.add(message.getSenderID());
+//
+//			
+//			processBet(message);
+//			
+//			//message.setSendTo(getNextHop());
+//			SendPackReplyHopSbet pktReply = new SendPackReplyHopSbet(message);
+//			pktReply.startRelative(0.1, this);
+//			
+//			SendPackSBetHopSbet pktSBet = new SendPackSBetHopSbet(hops, this.ID, 1, sBet);
+//			pktSBet.startRelative(0.1, this);
+//				
+//		}else{
+//			message = null;
+//		}*/
+//		
+//	}
+//		
+//	public void processBet(PackReplyHopSbet message) {	// faz o cal. do Sbet
+//		// faz a adicao do par <chave, valor>
+//		// chave = num de caminhos, valor = numero de nodos
+//		// descendentes com 'aquela' quantidade de caminho
+//		if(sonsPathMap.containsKey(message.getPath())){	
+//			sonsPathMap.put(message.getPath(), sonsPathMap.get(message.getPath()) + 1);
+//		}else{
+//			sonsPathMap.put(message.getPath(), 1);
+//		}
+//		
+//		double tmp = 0.0;
+//		
+//		for(Entry<Integer, Integer> e : sonsPathMap.entrySet())	// faz o calculo do Sbet
+//			tmp = tmp + (e.getValue() * ((double) this.pathsToSink / e.getKey()));
+//		
+//		setsBet(tmp);
+//	}
+//	
+//	@Override
+//	public void preStep() {
+//		
+//	}
+//
+//	@Override
+//	public void init() {
+//		//this.timeRcv = new Double(Double.POSITIVE_INFINITY);
+//		
+//		setRole(NodeRoleHopSbet.BORDER);
+//		setPathsToSink(0);
+//		setHops(0);
+//		setsBet(0.0);
+//		setNextHop(Integer.MAX_VALUE);
+//		setNeighborMaxSBet(Double.MIN_VALUE);
+//		setFirstBorder(false);
+//		setFirstHello(false);
+//		
+//		//this.sonsPath = new int[10];
+//		setSonsPathMap(new HashMap<Integer, Integer>());
+//		setSons(new ArrayList<Integer>());
+//		setNeighbors(new ArrayList<Integer>());
+//
+//		if (this.ID == 1) {
+//			this.setColor(Color.BLUE);
+//			setRole(NodeRoleHopSbet.SINK);
+//			setFirstHello(true);
+//			
+//			SendPackHelloHopSbet pkt = new SendPackHelloHopSbet(hops, 1, this.ID, this.ID);
+//			pkt.startRelative(2, this);
+//			/*Pack p = new Pack(this.hops, this.pathsToSink, this.ID, this.ID, this.sBet, TypeMessage.HELLO);
+//			
+//			PackTimer pTimer = new PackTimer(p);
+//			pTimer.startRelative(2, this);*/
+//		}
+//
+//	}
+//
+//	@Override
+//	public void neighborhoodChange() {
+//		// TODO Auto-generated method stub
+//
+//	}
+//
+//	@Override
+//	public void postStep() {
+//		// TODO Auto-generated method stub
+//
+//	}
+//
+//	@Override
+//	public void checkRequirements() throws WrongConfigurationException {
+//		// TODO Auto-generated method stub
+//
+//	}
+//
+//	@NodePopupMethod(menuText = "Enviar msg Border")
+//	public void enviarMsg() {
+//		/*
+//		 * if(this.ID == 1){ HelloPack msg = new HelloPack(this.hops,
+//		 * this.path); HelloTimer ht = new HelloTimer(msg); ht.startRelative(1,
+//		 * this); }
+//		 */
+//		//sendBorder();
+//		
+//		StartBorderFloodingHopSbet sendBorder = new StartBorderFloodingHopSbet();
+//		sendBorder.startRelative(0.1, this);
+//	}
+//
+//	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {
+//		Integer a = new Integer(hops);
+//		String str = Integer.toString(this.ID) + "|" + Integer.toString(a)
+//				+ "|" + pathsToSink;
+//		super.drawNodeAsDiskWithText(g, pt, highlight, str, 8, Color.YELLOW);
+//	}
+//
+//	public String toString() {
+//
+//		String str = "Dados do no ";
+//		str = str.concat("" + this.ID + "\n");
+//		str = str.concat("role = " + role + "\n");
+//		str = str.concat("Path = " + pathsToSink + "\n");
+//		str = str.concat("Hops = " + hops + "\n");
+//		str = str.concat("Sbet = " + sBet + "\n");
+//		str = str.concat("nextHop = " + nextHop + "\n");
+//		str = str.concat("maxSbet = " + neighborMaxSBet + "\n");
+//		str = str.concat("SonspathMap -> "+sonsPathMap+"\n");
+//		str = str.concat("sons -> "+sons+"\n");
+//		str = str.concat("\n");
+//		
+//		return str;
+//	}
+//
+//	/********************************************************************************
+//	 *							Gets e Sets
+//	 *********************************************************************************/
+//	public NodeRoleHopSbet getRole() {return role;}
+//	public void setRole(NodeRoleHopSbet role) {this.role = role;}
+//	public Map<Integer, Integer> getSonsPathMap() {return sonsPathMap;}
+//	public void setSonsPathMap(Map<Integer, Integer> sonsPathMap) {this.sonsPathMap = sonsPathMap;}
+//	public int getPathsToSink() {return pathsToSink;}
+//	public void setPathsToSink(int pathsToSink) {this.pathsToSink = pathsToSink;}
+//	public int getHops() {return hops;}
+//	public void setHops(int hops) {this.hops = hops;}
+//	public int getNextHop() {return nextHop;}
+//	public void setNextHop(int nextHop) {this.nextHop = nextHop;}
+//	public double getsBet() {return sBet;}
+//	public void setsBet(double sBet) {this.sBet = sBet;}
+//	public double getNeighborMaxSBet() {return neighborMaxSBet;}
+//	public void setNeighborMaxSBet(double neighborMaxSBet) {this.neighborMaxSBet = neighborMaxSBet;}
+//	public Boolean getFirstHello() {return firstHello;}
+//	public void setFirstHello(Boolean firstHello) {this.firstHello = firstHello;}
+//	public Boolean getFirstBorder() {return firstBorder;}
+//	public void setFirstBorder(Boolean firstBorder) {this.firstBorder = firstBorder;}
+//	public ArrayList<Integer> getSons() {return sons;}
+//	public void setSons(ArrayList<Integer> sons) {this.sons = sons;}
+//	public ArrayList<Integer> getNeighbors() {return neighbors;}
+//	public void setNeighbors(ArrayList<Integer> neighbors) {this.neighbors = neighbors;}
+//	
+//}
