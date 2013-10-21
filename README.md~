@@ -1,4 +1,4 @@
 SinkBet
 =======
 
-Projeto da disciplina de redes sem fio
+Projeto da disciplina de redes sem fio...
