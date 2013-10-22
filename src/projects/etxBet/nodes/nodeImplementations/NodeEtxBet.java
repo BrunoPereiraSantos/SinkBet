@@ -412,7 +412,7 @@ public class NodeEtxBet extends Node {
 			readConfigurationParameters();
 		}
 		
-		if(setNodesEv.contains(this.ID)){
+		/*if(setNodesEv.contains(this.ID)){
 			StartEventEtxBet se = new StartEventEtxBet();
 			int time = gerador.nextInt(1000) + 2020;
 			System.out.println(this.ID+" emitiriar evento em: "+time);
@@ -425,7 +425,7 @@ public class NodeEtxBet extends Node {
 				se.startRelative(time+i, this);
 				
 			}
-		}
+		}*/
 		
 	}
 	
