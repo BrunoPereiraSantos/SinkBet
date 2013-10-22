@@ -26,9 +26,13 @@ import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.TimerCollection;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
+import sinalgo.nodes.timers.Timer;
+import sinalgo.runtime.Runtime;
+import sinalgo.runtime.events.TimerEvent;
 import sinalgo.tools.Tools;
 
 public class NodeEtxBet extends Node {
@@ -157,12 +161,14 @@ public class NodeEtxBet extends Node {
 		// existe mais de um caminho deste nodo ate o sink com a mesmo ETX acumulado
 		if ((message.getETX() + etxToNode) == getEtxPath()) { 
 			this.setColor(Color.MAGENTA);
-			//setPathsToSink(getPathsToSink() + message.getPath());
-			setPathsToSink(getPathsToSink() + 1);
-			
+			setPathsToSink(getPathsToSink() + message.getPath());
+			//setPathsToSink(getPathsToSink() + 1);
+			fhp.updateTimer(2.0);
 			//setSentMyHello(false);
 		}
-
+		
+		
+		
 		// eh a primeira vez que o nodo recebe um hello
 		// ele deve encaminhar um pacote com seus dados
 		// Essas flags ajudam para nao sobrecarregar a memoria com eventos 
@@ -176,7 +182,8 @@ public class NodeEtxBet extends Node {
 			message.setSinkID(sinkID);
 			message.setPath(getPathsToSink());
 			fhp.setPkt(message);*/
-			fhp.startRelative(getHops(), this);	//Continuara o encaminhamento do pacote hello
+			double tempo = getHops()/*+gerador.nextInt(3)*/;
+			fhp.startRelative(tempo, this);	//Continuara o encaminhamento do pacote hello
 			setSentMyHello(true);
 			
 			// Dispara um timer para enviar um pacote de borda
@@ -190,6 +197,20 @@ public class NodeEtxBet extends Node {
 				setSentMyReply(true);
 			}
 		}
+		
+		System.out.println("======inicio===== node "+this.ID);
+		TimerCollection tc = getTimers();
+		System.out.println("size  "+tc.size());
+		Iterator<Timer> it = tc.iterator();
+		
+		while(it.hasNext()){
+			Timer tm = it.next();
+			if ( tm instanceof SendPackHelloEtxBet) {
+				SendPackHelloEtxBet a = (SendPackHelloEtxBet) tm;
+				System.out.println(tm.getFireTime());
+			}
+		}
+		System.out.println("======fim=====\n\n\n");
 		
 		message = null;	//drop message
 	}

@@ -37,7 +37,11 @@
 package sinalgo.nodes.timers;
 
 
+import java.util.Iterator;
+
+import projects.etxBet.nodes.timers.SendPackHelloEtxBet;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.TimerCollection;
 import sinalgo.runtime.Global;
 import sinalgo.runtime.Main;
 import sinalgo.runtime.Runtime;
@@ -126,6 +130,12 @@ public abstract class Timer implements Comparable<Timer> {
 		}
 	}
 
+	
+	public final void updateTimer(double updateTimer){
+		this.fireTime = fireTime + updateTimer;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
