@@ -13,5 +13,7 @@ public class SendPackHelloEtxBet extends Timer {
 		// TODO Auto-generated method stub
 		((NodeEtxBet)this.node).fwdHelloPack();
 	}
+
+
 	
 }

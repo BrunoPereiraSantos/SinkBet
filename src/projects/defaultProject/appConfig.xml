@@ -4,6 +4,6 @@
 	<GUI windowWidth="683" windowHeight="728" windowPosX="683" windowPosY="24" isMaximized="false" ControlPanelExpandSimulation="true" ControlPanelShowFullViewPanel="false" ControlPanelShowTextPanel="true" ControlPanelShowProjectControl="true" RunOperationIsLimited="true" helpWindowWidth="500" helpWindowHeight="500" helpWindowPosX="200" helpWindowPosY="200" helpWindowIsMaximized="false" />
 	<RandomSeed seedFromPreviousRun="6585434845476158221" />
 	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="false" updateCheckTimeStamp="0" runCmdLineArgs="" />
-	<GenNodesDlg numNodes="100" />
+	<GenNodesDlg numNodes="1024" />
 </sinalgo>
 

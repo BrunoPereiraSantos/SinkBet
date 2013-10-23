@@ -386,7 +386,7 @@ public class NodeHopSbet extends Node {
 			readConfigurationParameters();
 		}
 		
-		/*if(setNodesEv.contains(this.ID)){
+		if(setNodesEv.contains(this.ID)){
 			StartEvent se = new StartEvent();
 			int time = gerador.nextInt(1000) + 2020;
 			System.out.println(this.ID+" emitiriar evento em: "+time);
@@ -399,7 +399,7 @@ public class NodeHopSbet extends Node {
 				se.startRelative(time+i, this);
 				
 			}
-		}*/
+		}
 		
 	}
 	

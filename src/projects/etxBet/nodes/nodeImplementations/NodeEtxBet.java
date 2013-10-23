@@ -26,9 +26,13 @@ import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.TimerCollection;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
+import sinalgo.nodes.timers.Timer;
+import sinalgo.runtime.Runtime;
+import sinalgo.runtime.events.TimerEvent;
 import sinalgo.tools.Tools;
 
 public class NodeEtxBet extends Node {
@@ -99,10 +103,22 @@ public class NodeEtxBet extends Node {
 	private static int NumberNodes = 0; // numero total de nos
 	private static int ev = 0;			// % de nodes que vao emitir eventos
 	private static int nNodesEv = 0; //numero de nos que vao emitir eventos
+	private static int countDropPkt = 0;
 
 	//Disparadores de flood
 	SendPackHelloEtxBet fhp = new SendPackHelloEtxBet();
 	StartReplyFloodingEtxBet srf = new StartReplyFloodingEtxBet();
+	
+	//modelo de energia
+	private static final double cf = 50;
+	private static final double y = 0.016;
+	private static final double cr = 236.4;
+	//private static final double cr = 50;
+	private static final double alfa = 2;
+	private static final double range = 30;
+	
+	private double energySpentByNode = 0;
+	private double energySpentByEvent = 0;
 	
 	@Override
 	public void handleMessages(Inbox inbox) {
@@ -118,7 +134,10 @@ public class NodeEtxBet extends Node {
 			}else if(msg instanceof PackEventEtxBet) {
 				PackEventEtxBet d = (PackEventEtxBet) msg;
 				handlePackEvent(d);
+				energySpentByEvent += cr;
 			}
+			
+			energySpentByNode += cr;
 		}
 	}
 	
@@ -157,12 +176,14 @@ public class NodeEtxBet extends Node {
 		// existe mais de um caminho deste nodo ate o sink com a mesmo ETX acumulado
 		if ((message.getETX() + etxToNode) == getEtxPath()) { 
 			this.setColor(Color.MAGENTA);
-			//setPathsToSink(getPathsToSink() + message.getPath());
-			setPathsToSink(getPathsToSink() + 1);
-			
+			setPathsToSink(getPathsToSink() + message.getPath());
+			//setPathsToSink(getPathsToSink() + 1);
+			fhp.updateTimer(2.0);
 			//setSentMyHello(false);
 		}
-
+		
+		
+		
 		// eh a primeira vez que o nodo recebe um hello
 		// ele deve encaminhar um pacote com seus dados
 		// Essas flags ajudam para nao sobrecarregar a memoria com eventos 
@@ -176,7 +197,8 @@ public class NodeEtxBet extends Node {
 			message.setSinkID(sinkID);
 			message.setPath(getPathsToSink());
 			fhp.setPkt(message);*/
-			fhp.startRelative(getHops(), this);	//Continuara o encaminhamento do pacote hello
+			double tempo = getHops()/*+gerador.nextInt(3)*/;
+			fhp.startRelative(tempo, this);	//Continuara o encaminhamento do pacote hello
 			setSentMyHello(true);
 			
 			// Dispara um timer para enviar um pacote de borda
@@ -191,6 +213,20 @@ public class NodeEtxBet extends Node {
 			}
 		}
 		
+		/*System.out.println("======inicio===== node "+this.ID);
+		TimerCollection tc = getTimers();
+		System.out.println("size  "+tc.size());
+		Iterator<Timer> it = tc.iterator();
+		
+		while(it.hasNext()){
+			Timer tm = it.next();
+			if ( tm instanceof SendPackHelloEtxBet) {
+				SendPackHelloEtxBet a = (SendPackHelloEtxBet) tm;
+				System.out.println(tm.getFireTime());
+			}
+		}
+		System.out.println("======fim=====\n\n\n");*/
+		
 		message = null;	//drop message
 	}
 	
@@ -201,6 +237,8 @@ public class NodeEtxBet extends Node {
 		
 		//ESTATISTICA
 		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+		
+		energySpentByNode += cf + y * Math.pow(range, alfa);
 	}
 	
 	public void sendHelloFlooding() {
@@ -214,6 +252,8 @@ public class NodeEtxBet extends Node {
 		
 		//ESTATISTICA
 		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+		
+		energySpentByNode += cf + y * Math.pow(range, alfa);
 	}
 
 	public void sendReplyFlooding(){ //Dispara o flooding das respostas dos nodos com papel BORDER e RELAY
@@ -229,6 +269,8 @@ public class NodeEtxBet extends Node {
 			
 			//ESTATISTICA
 			setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+			
+			energySpentByNode += cf + y * Math.pow(range, alfa);
 		}
 	}
 	
@@ -275,7 +317,7 @@ public class NodeEtxBet extends Node {
 			message.setFwdID(this.ID);
 			
 			FwdPackReplyEtxBet fwdReply = new FwdPackReplyEtxBet(message);
-			fwdReply.startRelative(0.1, this);
+			fwdReply.startRelative(1, this);
 					
 		}
 		
@@ -314,6 +356,8 @@ public class NodeEtxBet extends Node {
 		
 		//ESTATISTICA
 		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+		
+		energySpentByNode += cf + y * Math.pow(range, alfa);
 	}
 	
 	
@@ -324,6 +368,22 @@ public class NodeEtxBet extends Node {
 	public void handlePackEvent(PackEventEtxBet message) {
 		// TODO Auto-generated method stub
 		
+		if(message.getnHop() == this.ID){
+			double p = gerador.nextInt(10) + 1;
+			System.out.println("probabilidade p = "+p);
+			//a escala esta entre 0 a 10, ou seja, o valor do etx na aresta idica
+			// que o nó tem ETX chanses de errar o pacote
+			// se etx = 1 então de cada 10 pacotes eu perco 1
+			if(10 - getEtxToMeFromNode(message.getPreviousHop()) < p){
+				System.out.println("perdeu um pacote");
+				setCountDropPkt(getCountDropPkt() + 1);
+				return;
+			}else{
+				System.out.println("aceitou um pacote");
+			}
+		}
+		
+		
 		if(this.ID == message.getDestination()){
 			this.setColor(Color.PINK);
 			message = null;
@@ -333,16 +393,21 @@ public class NodeEtxBet extends Node {
 			return;
 		}
 		
+		
 		if((!isInAggregation()) && (message.getnHop() == this.ID)){
+			
+			
 			System.out.println(this.ID+" agregando...");
 			setInAggregation(true);
 			
 			message.setnHop(nextHop); // modifica quem e o proximo hop
 			LoadAggregationEtxBet la = new LoadAggregationEtxBet(message);
-			setCountMsgAggr(getCountMsgAggr() + 1);
-			la.startRelative(getIntervalAggr(), this); //10 e o tempo para esperar por mensagens a ser agregadas
+			//setCountMsgAggr(getCountMsgAggr() + 1);
+			la.startRelative(getIntervalAggr(), this); //getIntervalAggr() e o tempo para esperar por mensagens a ser agregadas
 		}else if(message.getnHop() == this.ID){
+			
 			setCountMsgAggr(getCountMsgAggr() + 1);
+			
 			System.out.println(this.ID+" agregou "+getCountMsgAggr());
 			message = null;	// todas as mensgagens agregadas sao descartadas
 		}
@@ -360,17 +425,25 @@ public class NodeEtxBet extends Node {
 		
 		//ESTATISTICA
 		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+		
+		energySpentByNode += cf + y * Math.pow(range, alfa);
+		
+		energySpentByEvent += cf + y * Math.pow(range, alfa);
 	}
 	
 	
 	public void sendEvent(){
 		System.out.println(this.ID+" mandei um evento");
-		PackEventEtxBet pktEv = new PackEventEtxBet(this.ID, sinkID, nextHop);
+		PackEventEtxBet pktEv = new PackEventEtxBet(this.ID, sinkID, nextHop, this.ID);
 		broadcast(pktEv);
 		
 		//ESTATISTICA
 		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
 		setCount_all_ev_sent(getCount_all_ev_sent() + 1);	
+		
+		energySpentByNode += cf + y * Math.pow(range, alfa);
+		
+		energySpentByEvent += cf + y * Math.pow(range, alfa);
 	}
 	
 	@Override
@@ -412,7 +485,7 @@ public class NodeEtxBet extends Node {
 			readConfigurationParameters();
 		}
 		
-		if(setNodesEv.contains(this.ID)){
+		/*if(setNodesEv.contains(this.ID)){
 			StartEventEtxBet se = new StartEventEtxBet();
 			int time = gerador.nextInt(1000) + 2020;
 			System.out.println(this.ID+" emitiriar evento em: "+time);
@@ -425,7 +498,7 @@ public class NodeEtxBet extends Node {
 				se.startRelative(time+i, this);
 				
 			}
-		}
+		}*/
 		
 	}
 	
@@ -507,7 +580,8 @@ public class NodeEtxBet extends Node {
 		str = str.concat("maxSbet = " + neighborMaxSBet + "\n");
 		str = str.concat("SonspathMap -> "+sonsPathMap+"\n");
 		str = str.concat("sons -> "+sons+"\n");
-		str = str.concat("etx "+etxPath+"\n");
+		str = str.concat("etxPath "+etxPath+"\n");
+		str = str.concat("PktAggr "+countMsgAggr+"\n");
 		str = str.concat("\n");
 		
 		return str;
@@ -683,5 +757,64 @@ public class NodeEtxBet extends Node {
 		}
 		return 0.0;
 	}
+
+	public double getEtxToMeFromNode(int nodeID) {
+		Iterator<Edge> it2 = this.outgoingConnections.iterator();
+		EdgeWeightEtxBet e;
+		while (it2.hasNext()) {
+			e = (EdgeWeightEtxBet) it2.next();
+			if (e.endNode.ID == nodeID){
+				e = (EdgeWeightEtxBet) e.getOppositeEdge();
+				return e.getETX();
+			}
+		}
+		return 0.0;
+	}
+	
+	public static double getCf() {
+		return cf;
+	}
+
+	public static double getY() {
+		return y;
+	}
+
+	public static double getCr() {
+		return cr;
+	}
+
+	public static double getAlfa() {
+		return alfa;
+	}
+
+	public static double getRange() {
+		return range;
+	}
+
+	public double getEnergySpentByNode() {
+		return energySpentByNode;
+	}
+
+	public void setEnergySpentByNode(double energySpentByNode) {
+		this.energySpentByNode = energySpentByNode;
+	}
+
+	public double getEnergySpentByEvent() {
+		return energySpentByEvent;
+	}
+
+	public void setEnergySpentByEvent(double energySpentByEvent) {
+		this.energySpentByEvent = energySpentByEvent;
+	}
+
+	public static int getCountDropPkt() {
+		return countDropPkt;
+	}
+
+	public static void setCountDropPkt(int countDropPkt) {
+		NodeEtxBet.countDropPkt = countDropPkt;
+	}
+	
+	
 	
 }

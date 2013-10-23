@@ -248,9 +248,9 @@
 		
 		<QUDG rMin="30" rMax="50" ProbabilityType="constant" connectionProbability="0.6"/>
 		
-		<NumberNodes value="9"/>		
+		<NumberNodes value="1024"/>		
 		<EV value="50"/>								
 		<intervalAggr value="1.0"/>	
-	</Custom>
+		</Custom>
 </Document>
 

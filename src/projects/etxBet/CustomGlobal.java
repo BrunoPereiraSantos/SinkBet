@@ -40,10 +40,13 @@ package projects.etxBet;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
 import java.lang.Math;
+
 import javax.swing.JOptionPane;
+
 import projects.defaultProject.models.reliabilityModels.LossyDelivery;
 import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
 import projects.etxBet.nodes.nodeImplementations.NodeEtxBet;
@@ -51,6 +54,7 @@ import projects.etxBet.nodes.nodeImplementations.NodeRoleEtxBet;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.runtime.AbstractCustomGlobal;
+import sinalgo.runtime.Global;
 import sinalgo.runtime.Runtime;
 import sinalgo.tools.Tools;
 import sinalgo.tools.logging.Logging;
@@ -80,13 +84,15 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	
 	
 	
-	private Logging myLogHopSbet;
+	private Logging myLogEtxBet;
+	private double energy = 0.0;
+	private double energyEvent = 0.0;
 	
 	public void preRun() {
 		// colocar true como segundo parametro (append) quando for rodar mais simulacoes
 		// usa o arquivo que está no config.xml
 		// Add bruno
-		myLogHopSbet = Logging.getLogger("logHopSbet.txt", true);	// false caso for ler estes valores pelo CTDistribuido
+		myLogEtxBet = Logging.getLogger("logEtxBet.txt", true);	// false caso for ler estes valores pelo CTDistribuido
 		
 	}
 	
@@ -96,7 +102,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		NodeEtxBet n = (NodeEtxBet) Tools.getNodeByID(1);
 		int numberOfPktRcvSink = n.getCount_rcv_ev_sink();
 		
-		str += "Add brunoN=" + numberOfNodes;
+		str += "N=" + numberOfNodes;
 		str += " rcvSink="+numberOfPktRcvSink;
 		str += " allPkt="+NodeEtxBet.getCount_all_pkt_sent();
 		str += " AllpktEv=" + NodeEtxBet.getCount_all_ev_sent();
@@ -104,8 +110,10 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		str += " ev=" + NodeEtxBet.getEv();
 		str += " nNodesEv=" + NodeEtxBet.getnNodesEv();
 		str += " NumberNodes=" + NodeEtxBet.getNumberNodes();
+		str += " Energy=" + energy;
+		str += " EnergyEvent=" + energyEvent;
 		
-		myLogHopSbet.logln(str);
+		myLogEtxBet.logln(str);
 		
 		
 //		ArrayList<Integer> listPackSent = new ArrayList<Integer>();
@@ -175,6 +183,18 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	 * @see runtime.AbstractCustomGlobal#hasTerminated()
 	 */
 	public boolean hasTerminated() {
+		
+
+		Enumeration<Node> enumeration = Tools.getNodeList().getNodeEnumeration();
+		while (enumeration.hasMoreElements()) {
+			NodeEtxBet node = (NodeEtxBet) enumeration.nextElement();
+			energy += node.getEnergySpentByNode();
+			energyEvent += node.getEnergySpentByEvent();
+		}
+		
+		if(Global.currentTime >= 3500)
+			return true;
+		
 		return false;
 	}
 
@@ -257,7 +277,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 				
 				if(n.ID == 2){
 					if(e.endNode.ID == 1)
-						e.setETX(1);
+						e.setETX(9);
 					if(e.endNode.ID == 3)
 						e.setETX(1);
 					if(e.endNode.ID == 4)
