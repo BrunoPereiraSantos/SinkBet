@@ -23,7 +23,7 @@ public class EdgeWeightEtxBet extends Edge {
 	
 	public String toString(){
 		String str = "ETX link = ";
-		str = str.concat(ETX+"");
+		str += ETX;
 		return str;
 	}
 	

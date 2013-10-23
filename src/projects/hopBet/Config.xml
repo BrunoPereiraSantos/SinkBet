@@ -20,7 +20,7 @@
 		<!--  Simulation                                                           -->
 		<!--***********************************************************************-->
 		<!--Switches between synchronous and asynchronous mode.-->
-		<asynchronousMode value="true" />
+		<asynchronousMode value="false" />
 
 		<!--If set to true, the runtime obtains for each node a new position from the mobility model at the beginning of each round. This flag needs to be turned on if the chosen  mobility model of any node may change the node's position. Set this flag to FALSE for static graphs whose nodes do never change their position to increase performance.-->
 		<mobility value="false" />
@@ -251,8 +251,8 @@
 		
 		<NumberNodes value="1024"/>		
 		<EV value="50"/>								
-		<intervalAggr value="1.0"/>	
+		<intervalAggr value="5.0"/>	
 																								
-		</Custom>
+			</Custom>
 </Document>
 

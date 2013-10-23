@@ -252,7 +252,7 @@
 <NumberNodes value="1024"/>		
 <EV value="50"/>	
 									
-<intervalAggr value="1.0"/>	
+<intervalAggr value="5.0"/>	
 
 																																</Custom>
 </Document>
