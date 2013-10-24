@@ -110,8 +110,8 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		str += " ev=" + NodeEtxBet.getEv();
 		str += " nNodesEv=" + NodeEtxBet.getnNodesEv();
 		str += " NumberNodes=" + NodeEtxBet.getNumberNodes();
-		str += " Energy=" + energy;
-		str += " EnergyEvent=" + energyEvent;
+		str += " Energy=" + NodeEtxBet.getEnergySpentByNode();
+		str += " EnergyEvent=" + NodeEtxBet.getEnergySpentByEvent();
 		
 		myLogEtxBet.logln(str);
 		
@@ -185,15 +185,16 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	public boolean hasTerminated() {
 		
 
-		Enumeration<Node> enumeration = Tools.getNodeList().getNodeEnumeration();
-		while (enumeration.hasMoreElements()) {
-			NodeEtxBet node = (NodeEtxBet) enumeration.nextElement();
+		/*Iterator<Node> it = Tools.getNodeList().iterator();
+		while (it.hasNext()) {
+			NodeEtxBet node = (NodeEtxBet) it.next();
 			energy += node.getEnergySpentByNode();
 			energyEvent += node.getEnergySpentByEvent();
+			CountMsgAggr += node.getCountMsgAggr();
 		}
 		
 		if(Global.currentTime >= 3500)
-			return true;
+			return true;*/
 		
 		return false;
 	}

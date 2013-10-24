@@ -44,13 +44,13 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 import java.lang.Math;
+
 import javax.swing.JOptionPane;
+
 import projects.defaultProject.models.reliabilityModels.LossyDelivery;
 import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeRoleHopSbet;
-import sinalgo.configuration.Configuration;
-import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.runtime.AbstractCustomGlobal;
@@ -106,6 +106,8 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		str += " ev=" + NodeHopSbet.getEv();
 		str += " nNodesEv=" + NodeHopSbet.getnNodesEv();
 		str += " NumberNodes=" + NodeHopSbet.getNumberNodes();
+		str += " Energy=" + NodeHopSbet.getEnergySpentByNode();
+		str += " EnergyEvent=" + NodeHopSbet.getEnergySpentByEvent();
 		
 		myLogHopSbet.logln(str);
 		

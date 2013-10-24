@@ -8,10 +8,10 @@
 		<dimensions value="2" />
 
 		<!--Length of the deployment field along the x-axis.-->
-		<dimX value="1000" />
+		<dimX value="200" />
 
 		<!--Length of the deployment field along the y-axis.-->
-		<dimY value="1000" />
+		<dimY value="200" />
 
 		<!--Length of the deployment field along the z-axis.-->
 		<dimZ value="500" />
@@ -231,7 +231,7 @@
 
 <GeometricNodeCollection rMax="100"/>
 
-<UDG rMax="100"/>
+<UDG rMax="30"/>
 
 <SINR alpha="2" beta="0.7" noise="0"/>
 
@@ -249,11 +249,11 @@
 <QUDG rMin="30" rMax="50" ProbabilityType="constant" connectionProbability="0.6"/>
 <LossyDelivery dropRate="0.1"/>
 
-<NumberNodes value="1024"/>		
+<NumberNodes value="200"/>		
 <EV value="50"/>	
 									
-<intervalAggr value="5.0"/>	
+<intervalAggr value="10.0"/>	
 
-																																</Custom>
+																																									</Custom>
 </Document>
 

@@ -231,7 +231,7 @@
 		
 		<GeometricNodeCollection rMax="100"/>
 		
-		<UDG rMax="100"/>
+		<UDG rMax="30"/>
 		
 		<SINR alpha="2" beta="0.7" noise="0"/>
 		
@@ -251,6 +251,6 @@
 		<NumberNodes value="1024"/>		
 		<EV value="50"/>								
 		<intervalAggr value="1.0"/>	
-		</Custom>
+			</Custom>
 </Document>
 

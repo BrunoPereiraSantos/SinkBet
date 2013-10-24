@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+$numRounds = 100; # number of rounds to perform per simulation
+
+for($numNodes=200; $numNodes<=500; $numNodes+=100) {
+system("java -cp binaries/bin sinalgo.Run " .
+"-project sample1 " .             # choose the project
+"-gen $numNodes sample1:S1Node Random RandomDirection " . # generate nodes
+"-overwrite " .                   # Overwrite configuration file parameters
+"exitAfter=true exitAfter/Rounds=$numRounds " . # number of rounds to perform & stop
+"exitOnTerminationInGUI=true " .  # Close GUI when hasTerminated() returns true
+"AutoStart=true " .               # Automatically start communication protocol
+"outputToConsole=false " .        # Create a framework log-file for each run
+"extendedControl=false " .        # Don't show the extended control in the GUI
+"-rounds $numRounds " .           # Number of rounds to start simulation
+"-refreshRate 20");               # Don't draw GUI often
+}

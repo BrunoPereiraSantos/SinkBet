@@ -103,7 +103,7 @@ public class NodeEtxBet extends Node {
 	private static int NumberNodes = 0; // numero total de nos
 	private static int ev = 0;			// % de nodes que vao emitir eventos
 	private static int nNodesEv = 0; //numero de nos que vao emitir eventos
-	private static int countDropPkt = 0;
+	private static int countDropPkt = 0;	//contador no numero de pacotes perdidos
 
 	//Disparadores de flood
 	SendPackHelloEtxBet fhp = new SendPackHelloEtxBet();
@@ -112,13 +112,13 @@ public class NodeEtxBet extends Node {
 	//modelo de energia
 	private static final double cf = 50;
 	private static final double y = 0.016;
-	private static final double cr = 236.4;
-	//private static final double cr = 50;
+	//private static final double cr = 236.4;
+	private static final double cr = 50;
 	private static final double alfa = 2;
 	private static final double range = 30;
 	
-	private double energySpentByNode = 0;
-	private double energySpentByEvent = 0;
+	private static double energySpentByNode = 0;
+	private static double energySpentByEvent = 0;
 	
 	@Override
 	public void handleMessages(Inbox inbox) {
@@ -242,7 +242,6 @@ public class NodeEtxBet extends Node {
 	}
 	
 	public void sendHelloFlooding() {
-		
 		
 		//Somente o no que inicia o flood (neste caso o no 1) executa essa chamada
 		PackHelloEtxBet pkt = new PackHelloEtxBet(hops, 1, this.ID, this.ID, 0.0);
@@ -368,12 +367,12 @@ public class NodeEtxBet extends Node {
 	public void handlePackEvent(PackEventEtxBet message) {
 		// TODO Auto-generated method stub
 		
-		if(message.getnHop() == this.ID){
+		/*if(message.getnHop() == this.ID){
 			double p = gerador.nextInt(10) + 1;
 			System.out.println("probabilidade p = "+p);
 			//a escala esta entre 0 a 10, ou seja, o valor do etx na aresta idica
-			// que o nó tem ETX chanses de errar o pacote
-			// se etx = 1 então de cada 10 pacotes eu perco 1
+			// que o nï¿½ tem ETX chanses de errar o pacote
+			// se etx = 1 entï¿½o de cada 10 pacotes eu perco 1
 			if(10 - getEtxToMeFromNode(message.getPreviousHop()) < p){
 				System.out.println("perdeu um pacote");
 				setCountDropPkt(getCountDropPkt() + 1);
@@ -381,10 +380,10 @@ public class NodeEtxBet extends Node {
 			}else{
 				System.out.println("aceitou um pacote");
 			}
-		}
+		}*/
 		
 		
-		if(this.ID == message.getDestination()){
+		if((this.ID == message.getDestination()) && (message.getnHop() == this.ID)){
 			this.setColor(Color.PINK);
 			message = null;
 
@@ -406,7 +405,7 @@ public class NodeEtxBet extends Node {
 			la.startRelative(getIntervalAggr(), this); //getIntervalAggr() e o tempo para esperar por mensagens a ser agregadas
 		}else if(message.getnHop() == this.ID){
 			
-			setCountMsgAggr(getCountMsgAggr() + 1);
+			//setCountMsgAggr(getCountMsgAggr() + 1);
 			
 			System.out.println(this.ID+" agregou "+getCountMsgAggr());
 			message = null;	// todas as mensgagens agregadas sao descartadas
@@ -418,7 +417,7 @@ public class NodeEtxBet extends Node {
 		
 		setInAggregation(false); //No vai encaminhar o pacote, entao deve voltar ao estado de "nao agregado mensagens"
 		
-		System.out.println(this.ID+" encaminhou mais 1");
+		//System.out.println(this.ID+" encaminhou mais 1");
 		setCountMsgAggr(0);
 		
 		broadcast(message);
@@ -485,20 +484,20 @@ public class NodeEtxBet extends Node {
 			readConfigurationParameters();
 		}
 		
-		/*if(setNodesEv.contains(this.ID)){
+		if(setNodesEv.contains(this.ID)){
 			StartEventEtxBet se = new StartEventEtxBet();
 			int time = gerador.nextInt(1000) + 2020;
 			System.out.println(this.ID+" emitiriar evento em: "+time);
 			se.startRelative(time, this);
 			
 			
-			for(int i = 10; i < 300; i+=10){
-				se = new StartEventEtxBet();
-				//System.out.println(this.ID+" emitiriar evento em: "+(time+i)+"  "+i/10);
-				se.startRelative(time+i, this);
-				
-			}
-		}*/
+//			for(int i = 10; i < 300; i+=10){
+//				se = new StartEventEtxBet();
+//				//System.out.println(this.ID+" emitiriar evento em: "+(time+i)+"  "+i/10);
+//				se.startRelative(time+i, this);
+//				
+//			}
+		}
 		
 	}
 	
@@ -556,17 +555,17 @@ public class NodeEtxBet extends Node {
 	}
 
 
-	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {
-		Integer a = new Integer(hops);
-		
-		String str = Integer.toString(this.ID) + "|" + Integer.toString(a) + "|" + pathsToSink;
-		/*str = str.concat("|" + getTotalLostPackets() + " " + getTotalLostPacktetsByMe());
-		str = str.concat("|" + getTotalPacktesSent() + " " + getTotalSentByMe());*/
-		if(this.ID == 1){
-			str +=  "|" + count_rcv_ev_sink;
-		}
-		super.drawNodeAsDiskWithText(g, pt, highlight, str, 7, Color.YELLOW);
-	}
+//	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {
+//		Integer a = new Integer(hops);
+//		
+//		String str = Integer.toString(this.ID) + "|" + Integer.toString(a) + "|" + pathsToSink;
+//		/*str = str.concat("|" + getTotalLostPackets() + " " + getTotalLostPacktetsByMe());
+//		str = str.concat("|" + getTotalPacktesSent() + " " + getTotalSentByMe());*/
+//		if(this.ID == 1){
+//			str +=  "|" + count_rcv_ev_sink;
+//		}
+//		super.drawNodeAsDiskWithText(g, pt, highlight, str, 7, Color.YELLOW);
+//	}
 
 	public String toString() {
 
@@ -791,22 +790,6 @@ public class NodeEtxBet extends Node {
 		return range;
 	}
 
-	public double getEnergySpentByNode() {
-		return energySpentByNode;
-	}
-
-	public void setEnergySpentByNode(double energySpentByNode) {
-		this.energySpentByNode = energySpentByNode;
-	}
-
-	public double getEnergySpentByEvent() {
-		return energySpentByEvent;
-	}
-
-	public void setEnergySpentByEvent(double energySpentByEvent) {
-		this.energySpentByEvent = energySpentByEvent;
-	}
-
 	public static int getCountDropPkt() {
 		return countDropPkt;
 	}
@@ -814,6 +797,23 @@ public class NodeEtxBet extends Node {
 	public static void setCountDropPkt(int countDropPkt) {
 		NodeEtxBet.countDropPkt = countDropPkt;
 	}
+
+	public static double getEnergySpentByNode() {
+		return energySpentByNode;
+	}
+
+	public static void setEnergySpentByNode(double energySpentByNode) {
+		NodeEtxBet.energySpentByNode = energySpentByNode;
+	}
+
+	public static double getEnergySpentByEvent() {
+		return energySpentByEvent;
+	}
+
+	public static void setEnergySpentByEvent(double energySpentByEvent) {
+		NodeEtxBet.energySpentByEvent = energySpentByEvent;
+	}
+	
 	
 	
 	
