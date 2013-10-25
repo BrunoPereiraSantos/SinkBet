@@ -367,20 +367,20 @@ public class NodeEtxBet extends Node {
 	public void handlePackEvent(PackEventEtxBet message) {
 		// TODO Auto-generated method stub
 		
-		/*if(message.getnHop() == this.ID){
-			double p = gerador.nextInt(10) + 1;
-			System.out.println("probabilidade p = "+p);
+		if(message.getnHop() == this.ID){
+			double p = gerador.nextInt(100) + 1;
+			System.out.println("No "+this.ID+" gerou um probabilidade p = "+p);
 			//a escala esta entre 0 a 10, ou seja, o valor do etx na aresta idica
-			// que o n� tem ETX chanses de errar o pacote
-			// se etx = 1 ent�o de cada 10 pacotes eu perco 1
-			if(10 - getEtxToMeFromNode(message.getPreviousHop()) < p){
+			// que o noh tem ETX chanses de errar o pacote
+			// se etx = 1 entao de cada 10 pacotes eu perco 1
+			if(100 - getEtxToMeFromNode(message.getPreviousHop()) < p){
 				System.out.println("perdeu um pacote");
 				setCountDropPkt(getCountDropPkt() + 1);
 				return;
 			}else{
 				System.out.println("aceitou um pacote");
 			}
-		}*/
+		}
 		
 		
 		if((this.ID == message.getDestination()) && (message.getnHop() == this.ID)){
@@ -391,9 +391,21 @@ public class NodeEtxBet extends Node {
 			setCount_rcv_ev_sink(getCount_rcv_ev_sink() + 1);
 			return;
 		}
-		
-		
+	
 		if((!isInAggregation()) && (message.getnHop() == this.ID)){
+			
+			setInAggregation(true);
+			
+			message.setnHop(nextHop); // modifica quem e o proximo hop
+			//setCountMsgAggr(getCountMsgAggr() + 1);
+			fwdEvent( message);
+		}else if(message.getnHop() == this.ID){
+			
+			//setCountMsgAggr(getCountMsgAggr() + 1);
+			message = null;	// todas as mensgagens agregadas sao descartadas
+		}
+		
+		/*if((!isInAggregation()) && (message.getnHop() == this.ID)){
 			
 			
 			System.out.println(this.ID+" agregando...");
@@ -409,7 +421,7 @@ public class NodeEtxBet extends Node {
 			
 			System.out.println(this.ID+" agregou "+getCountMsgAggr());
 			message = null;	// todas as mensgagens agregadas sao descartadas
-		}
+		}*/
 	}
 	
 	public void fwdEvent(PackEventEtxBet message){

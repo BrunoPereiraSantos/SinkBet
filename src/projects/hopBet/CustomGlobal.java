@@ -48,6 +48,8 @@ import java.lang.Math;
 import javax.swing.JOptionPane;
 
 import projects.defaultProject.models.reliabilityModels.LossyDelivery;
+import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
+import projects.etxBet.nodes.nodeImplementations.NodeEtxBet;
 import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeRoleHopSbet;
@@ -106,6 +108,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		str += " ev=" + NodeHopSbet.getEv();
 		str += " nNodesEv=" + NodeHopSbet.getnNodesEv();
 		str += " NumberNodes=" + NodeHopSbet.getNumberNodes();
+		str += " PktDrop=" + NodeHopSbet.getCountDropPkt();
 		str += " Energy=" + NodeHopSbet.getEnergySpentByNode();
 		str += " EnergyEvent=" + NodeHopSbet.getEnergySpentByEvent();
 		
@@ -230,6 +233,8 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	
 	public void insertETX(){
 		Iterator<Node> it = Runtime.nodes.iterator();
+		NodeHopSbet n;
+		/*Iterator<Node> it = Runtime.nodes.iterator();
 		Node n;
 		Random generator = new Random(1);
 		while(it.hasNext()){
@@ -242,6 +247,90 @@ public class CustomGlobal extends AbstractCustomGlobal{
 				//e.setETX(UniformDistribution.nextUniform(0, 1));
 				//e.setETX(generator.nextDouble());
 				e.setETX(1+generator.nextInt(9));
+
+			}
+		}*/
+		
+		while(it.hasNext()){
+			n = (NodeHopSbet) it.next();
+			//System.out.println(n);
+			Iterator<Edge> it2 = n.outgoingConnections.iterator();
+			EdgeWeightHopSbet e;
+			while(it2.hasNext()){
+				e = (EdgeWeightHopSbet) it2.next();
+				if(n.ID == 1){
+					if(e.endNode.ID == 2)
+						e.setETX(2);
+				}
+				
+				if(n.ID == 2){
+					if(e.endNode.ID == 1)
+						e.setETX(9);
+					if(e.endNode.ID == 3)
+						e.setETX(1);
+					if(e.endNode.ID == 4)
+						e.setETX(1);
+				}
+
+				if(n.ID == 3){
+					if(e.endNode.ID == 2)
+						e.setETX(2);
+					if(e.endNode.ID == 5)
+						e.setETX(1);
+					if(e.endNode.ID == 6)
+						e.setETX(1);
+				}
+
+				if(n.ID == 4){
+					if(e.endNode.ID == 2)
+						e.setETX(2);
+					if(e.endNode.ID == 5)
+						e.setETX(1);
+				}
+
+				if(n.ID == 5){
+					if(e.endNode.ID == 3)
+						e.setETX(2);
+					if(e.endNode.ID == 4)
+						e.setETX(2);
+					if(e.endNode.ID == 7)
+						e.setETX(1);
+					if(e.endNode.ID == 8)
+						e.setETX(1);
+				}
+
+				if(n.ID == 6){
+					if(e.endNode.ID == 3)
+						e.setETX(9);
+					if(e.endNode.ID == 7)
+						e.setETX(1);
+				}
+
+				if(n.ID == 7){
+					if(e.endNode.ID == 5)
+						e.setETX(2);
+					if(e.endNode.ID == 6)
+						e.setETX(1);
+					if(e.endNode.ID == 8)
+						e.setETX(2);
+				}
+
+				if(n.ID == 8){
+					if(e.endNode.ID == 5)
+						e.setETX(4);
+					if(e.endNode.ID == 7)
+						e.setETX(2);
+					if(e.endNode.ID == 9)
+						e.setETX(2);
+				}
+
+				if(n.ID == 9){
+					if(e.endNode.ID == 8)
+						e.setETX(1);
+				}
+				
+				//e.setETX(1+generator.nextInt(9));
+				System.out.println("ID "+ e.getID()+"      " +n.ID+" ~["+e.getETX()+"]> "+e.endNode.ID);
 
 			}
 		}

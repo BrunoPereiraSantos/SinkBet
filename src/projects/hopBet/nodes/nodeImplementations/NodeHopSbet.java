@@ -5,11 +5,14 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
+import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
 import projects.hopBet.nodes.messages.PackEventHopSbet;
 import projects.hopBet.nodes.messages.PackHelloHopSbet;
 import projects.hopBet.nodes.messages.PackReplyHopSbet;
@@ -24,6 +27,7 @@ import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.edges.Edge;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
@@ -324,20 +328,20 @@ public class NodeHopSbet extends Node {
 	public void handlePackEvent(PackEventHopSbet message) {
 		// TODO Auto-generated method stub
 		
-		/*if(message.getnHop() == this.ID){
-			double p = gerador.nextInt(10) + 1;
-			System.out.println("probabilidade p = "+p);
+		if(message.getnHop() == this.ID){
+			double p = gerador.nextInt(100) + 1;
+			System.out.println("No "+this.ID+" gerou um probabilidade p = "+p);
 			//a escala esta entre 0 a 10, ou seja, o valor do etx na aresta idica
-			// que o n� tem ETX chanses de errar o pacote
-			// se etx = 1 ent�o de cada 10 pacotes eu perco 1
-			if(10 - getEtxToMeFromNode(message.getPreviousHop()) < p){
+			// que o noh tem ETX chanses de errar o pacote
+			// se etx = 1 entao de cada 10 pacotes eu perco 1
+			if(100 - getEtxToMeFromNode(message.getPreviousHop()) < p){
 				System.out.println("perdeu um pacote");
 				setCountDropPkt(getCountDropPkt() + 1);
 				return;
 			}else{
 				System.out.println("aceitou um pacote");
 			}
-		}*/
+		}
 		
 		if((this.ID == message.getDestination()) && (message.getnHop() == this.ID)){	
 			this.setColor(Color.PINK);
@@ -349,6 +353,17 @@ public class NodeHopSbet extends Node {
 		}
 		
 		if((!isInAggregation()) && (message.getnHop() == this.ID)){
+			setInAggregation(true);
+			
+			message.setnHop(nextHop); // modifica quem e o proximo hop
+			setCountMsgAggr(getCountMsgAggr() + 1);
+			fwdEvent(message);
+		}else if(message.getnHop() == this.ID){
+			setCountMsgAggr(getCountMsgAggr() + 1);
+			message = null;	// todas as mensgagens agregadas sao descartadas
+		}
+		
+		/*if((!isInAggregation()) && (message.getnHop() == this.ID)){
 			System.out.println(this.ID+" agregando...");
 			setInAggregation(true);
 			
@@ -361,7 +376,7 @@ public class NodeHopSbet extends Node {
 			setCountMsgAggr(getCountMsgAggr() + 1);
 			System.out.println(this.ID+" agregou "+getCountMsgAggr());
 			message = null;	// todas as mensgagens agregadas sao descartadas
-		}
+		}*/
 	}
 	
 	public void fwdEvent(PackEventHopSbet message){
@@ -386,7 +401,7 @@ public class NodeHopSbet extends Node {
 	
 	public void sendEvent(){
 		System.out.println(this.ID+" mandei um evento");
-		PackEventHopSbet pktEv = new PackEventHopSbet(this.ID, sinkID, nextHop);
+		PackEventHopSbet pktEv = new PackEventHopSbet(this.ID, sinkID, nextHop, this.ID);
 		broadcast(pktEv);
 		
 		//ESTATISTICA
@@ -555,7 +570,18 @@ public class NodeHopSbet extends Node {
 	public double getNeighborMaxSBet() {return neighborMaxSBet;}
 	public void setNeighborMaxSBet(double neighborMaxSBet) {this.neighborMaxSBet = neighborMaxSBet;}
 
-	
+	public double getEtxToMeFromNode(int nodeID) {
+		Iterator<Edge> it2 = this.outgoingConnections.iterator();
+		EdgeWeightHopSbet e;
+		while (it2.hasNext()) {
+			e = (EdgeWeightHopSbet) it2.next();
+			if (e.endNode.ID == nodeID){
+				e = (EdgeWeightHopSbet) e.getOppositeEdge();
+				return e.getETX();
+			}
+		}
+		return 0.0;
+	}
 
 	public boolean isSentMyHello() {
 		return sentMyHello;

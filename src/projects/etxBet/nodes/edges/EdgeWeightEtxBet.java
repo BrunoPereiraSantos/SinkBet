@@ -8,7 +8,7 @@ public class EdgeWeightEtxBet extends Edge {
 
 	public EdgeWeightEtxBet() {
 		super();
-		UniformDistribution cte = new UniformDistribution(1, 10);
+		UniformDistribution cte = new UniformDistribution(1, 100);
 		setETX((int)cte.nextSample());
 		
 	}

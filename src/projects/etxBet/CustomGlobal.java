@@ -110,6 +110,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		str += " ev=" + NodeEtxBet.getEv();
 		str += " nNodesEv=" + NodeEtxBet.getnNodesEv();
 		str += " NumberNodes=" + NodeEtxBet.getNumberNodes();
+		str += " PktDrop=" + NodeEtxBet.getCountDropPkt();
 		str += " Energy=" + NodeEtxBet.getEnergySpentByNode();
 		str += " EnergyEvent=" + NodeEtxBet.getEnergySpentByEvent();
 		

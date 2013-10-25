@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sinalgo>
-	<ProjectSelector windowWidth="800" windowHeight="600" lastChosenProject="etxBet" windowPosX="660" windowPosY="1353" isMaximized="false" selectedTab="3" />
-	<GUI windowWidth="683" windowHeight="715" windowPosX="291" windowPosY="1104" isMaximized="true" ControlPanelExpandSimulation="true" ControlPanelShowFullViewPanel="false" ControlPanelShowTextPanel="true" ControlPanelShowProjectControl="true" RunOperationIsLimited="true" helpWindowWidth="500" helpWindowHeight="500" helpWindowPosX="200" helpWindowPosY="200" helpWindowIsMaximized="false" />
-	<RandomSeed seedFromPreviousRun="3566699403241141089" />
-	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="false" updateCheckTimeStamp="0" runCmdLineArgs="-batch -project hopBet -gen 200 hopBet:NodeHopSbet Random -overwrite exitAfter=true exitAfter/Rounds=4000 AutoStart=true -rounds 4000 NumberNodes=200 EV=50 intervalAggr=10 " />
-	<GenNodesDlg numNodes="200" />
+	<ProjectSelector windowWidth="600" windowHeight="400" lastChosenProject="etxBet" windowPosX="53" windowPosY="134" isMaximized="false" selectedTab="2" />
+	<GUI windowWidth="800" windowHeight="600" windowPosX="0" windowPosY="24" isMaximized="true" ControlPanelExpandSimulation="true" ControlPanelShowFullViewPanel="true" ControlPanelShowTextPanel="true" ControlPanelShowProjectControl="true" RunOperationIsLimited="true" helpWindowWidth="500" helpWindowHeight="500" helpWindowPosX="200" helpWindowPosY="200" helpWindowIsMaximized="false" />
+	<RandomSeed seedFromPreviousRun="2294610974508173924" />
+	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="true" updateCheckTimeStamp="1382656271084" runCmdLineArgs="" />
+	<GenNodesDlg numNodes="1024" />
 </sinalgo>
 

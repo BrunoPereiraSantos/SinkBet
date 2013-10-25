@@ -8,10 +8,10 @@
 		<dimensions value="2" />
 
 		<!--Length of the deployment field along the x-axis.-->
-		<dimX value="200" />
+		<dimX value="400" />
 
 		<!--Length of the deployment field along the y-axis.-->
-		<dimY value="200" />
+		<dimY value="400" />
 
 		<!--Length of the deployment field along the z-axis.-->
 		<dimZ value="500" />
@@ -249,11 +249,11 @@
 <QUDG rMin="30" rMax="50" ProbabilityType="constant" connectionProbability="0.6"/>
 <LossyDelivery dropRate="0.1"/>
 
-<NumberNodes value="200"/>		
+<NumberNodes value="500"/>		
 <EV value="50"/>	
 									
 <intervalAggr value="10.0"/>	
 
-																																									</Custom>
+																																																</Custom>
 </Document>
 

@@ -1,9 +1,17 @@
 package projects.hopBet.nodes.edges;
 
 import sinalgo.nodes.edges.Edge;
+import sinalgo.tools.statistics.UniformDistribution;
 
 public class EdgeWeightHopSbet extends Edge {
 	public double ETX;
+
+	
+	public EdgeWeightHopSbet() {
+		super();
+		UniformDistribution cte = new UniformDistribution(1, 100);
+		setETX((int)cte.nextSample());
+	}
 
 	public double getETX() {
 		return ETX;
@@ -15,7 +23,7 @@ public class EdgeWeightHopSbet extends Edge {
 	
 	public String toString(){
 		String str = "ETX link = ";
-		str = str.concat(ETX+"");
+		str += ETX;
 		return str;
 	}
 	
