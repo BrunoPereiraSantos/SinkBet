@@ -352,6 +352,7 @@ public class NodeHopSbet extends Node {
 			return;
 		}
 		
+		//sem agregacao
 		if((!isInAggregation()) && (message.getnHop() == this.ID)){
 			setInAggregation(true);
 			
@@ -363,6 +364,7 @@ public class NodeHopSbet extends Node {
 			message = null;	// todas as mensgagens agregadas sao descartadas
 		}
 		
+		//com agregacao
 		/*if((!isInAggregation()) && (message.getnHop() == this.ID)){
 			System.out.println(this.ID+" agregando...");
 			setInAggregation(true);

@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 $numRounds = 4000; # number of rounds to perform per simulation
-$numNodes=1024; # number of nodes
-$numExec=2;
+$numNodes=200; # number of nodes
+$numExec=25;
 $EV=50;
 $intervalAggr=10;
-$dimX=500;
-$dimY=500;
+$dimX=300;
+$dimY=300;
 
 for($i=0 ; $i<$numExec; $i+=1) {
   system("./sinalgo " .

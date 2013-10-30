@@ -1,2 +1,0 @@
-N=1024 rcvSink=249 allPkt=12993 AllpktEv=512 intervalAggr=10.0 ev=50 nNodesEv=512 NumberNodes=1024 PktDrop=263 Energy=7734699.200001709 EnergyEvent=1512397.1999999573
-N=1024 rcvSink=257 allPkt=17153 AllpktEv=512 intervalAggr=10.0 ev=50 nNodesEv=512 NumberNodes=1024 PktDrop=255 Energy=1.0388503200003326E7 EnergyEvent=2130293.199999863

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sinalgo>
-	<ProjectSelector windowWidth="600" windowHeight="400" lastChosenProject="etxBet" windowPosX="53" windowPosY="134" isMaximized="false" selectedTab="2" />
+	<ProjectSelector windowWidth="600" windowHeight="400" lastChosenProject="etxBet" windowPosX="0" windowPosY="24" isMaximized="true" selectedTab="2" />
 	<GUI windowWidth="800" windowHeight="600" windowPosX="0" windowPosY="24" isMaximized="true" ControlPanelExpandSimulation="true" ControlPanelShowFullViewPanel="true" ControlPanelShowTextPanel="true" ControlPanelShowProjectControl="true" RunOperationIsLimited="true" helpWindowWidth="500" helpWindowHeight="500" helpWindowPosX="200" helpWindowPosY="200" helpWindowIsMaximized="false" />
-	<RandomSeed seedFromPreviousRun="2294610974508173924" />
-	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="true" updateCheckTimeStamp="1382656271084" runCmdLineArgs="" />
-	<GenNodesDlg numNodes="1024" />
+	<RandomSeed seedFromPreviousRun="-5619977123135941682" />
+	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="true" updateCheckTimeStamp="1382976722480" runCmdLineArgs="-batch -project hopBet -gen 200 hopBet:NodeHopSbet Random -rounds 4000 -overwrite NumberNodes=200 EV=50 intervalAggr=10 dimX=300 dimY=300 " />
+	<GenNodesDlg numNodes="500" />
 </sinalgo>
 
