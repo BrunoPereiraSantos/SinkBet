@@ -38,6 +38,7 @@ package projects.etxBet;
 
 
 import java.awt.Color;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -98,21 +99,26 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	
 	public void onExit() {
 		int numberOfNodes = Tools.getNodeList().size();
+		DecimalFormat format = new DecimalFormat();  
+	    format.setMaximumFractionDigits(3);  
+	    format.setMinimumFractionDigits(3);
 		String str = "";
-		NodeEtxBet n = (NodeEtxBet) Tools.getNodeByID(1);
-		int numberOfPktRcvSink = n.getCount_rcv_ev_sink();
 		
 		str += "N=" + numberOfNodes;
-		str += " rcvSink="+numberOfPktRcvSink;
-		str += " allPkt="+NodeEtxBet.getCount_all_pkt_sent();
+		str += " rcvSink="+NodeEtxBet.getCount_rcv_ev_sink();
+		str += " allMsg_HeR="+NodeEtxBet.getCount_all_msg_sent();
+		str += " allPkt="+NodeEtxBet.getCount_all_broadcast();
 		str += " AllpktEv=" + NodeEtxBet.getCount_all_ev_sent();
+		//str += " PktAggr=" + NodeEtxBet.getCount_all_msg_aggr();
+		str += " PktAggr=" + (NodeEtxBet.getCount_all_ev_sent() - NodeEtxBet.getCount_rcv_ev_sink());
 		str += " intervalAggr=" + NodeEtxBet.getIntervalAggr();
 		str += " ev=" + NodeEtxBet.getEv();
 		str += " nNodesEv=" + NodeEtxBet.getnNodesEv();
 		str += " NumberNodes=" + NodeEtxBet.getNumberNodes();
 		str += " PktDrop=" + NodeEtxBet.getCountDropPkt();
-		str += " Energy=" + NodeEtxBet.getEnergySpentByNode();
-		str += " EnergyEvent=" + NodeEtxBet.getEnergySpentByEvent();
+		str += " Energy=" + format.format(NodeEtxBet.getEnergySpentTotal());
+		str += " EnergyEvent=" + format.format(NodeEtxBet.getEnergySpentByEvent());
+		
 		
 		myLogEtxBet.logln(str);
 		
