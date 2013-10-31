@@ -9,7 +9,7 @@ public class StartEventEtxBet extends Timer {
 	@Override
 	public void fire() {
 		// TODO Auto-generated method stub
-		((NodeEtxBet)this.node).sendEvent();
+		((NodeEtxBet)this.node).startEvent();
 	}
 
 	@Override

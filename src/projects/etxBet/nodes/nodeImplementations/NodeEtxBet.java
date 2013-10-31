@@ -1,7 +1,6 @@
 package projects.etxBet.nodes.nodeImplementations;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,10 +11,11 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
+import projects.etxBet.nodes.messages.PackAckEtxBet;
 import projects.etxBet.nodes.messages.PackEventEtxBet;
 import projects.etxBet.nodes.messages.PackHelloEtxBet;
 import projects.etxBet.nodes.messages.PackReplyEtxBet;
-import projects.etxBet.nodes.timers.LoadAggregationEtxBet;
+import projects.etxBet.nodes.timers.ResendEventEtxBet;
 import projects.etxBet.nodes.timers.SendPackHelloEtxBet;
 import projects.etxBet.nodes.timers.FwdPackReplyEtxBet;
 import projects.etxBet.nodes.timers.StartReplyFloodingEtxBet;
@@ -24,15 +24,12 @@ import projects.etxBet.nodes.timers.StartSimulationEtxBet;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
-import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
-import sinalgo.nodes.TimerCollection;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
-import sinalgo.nodes.timers.Timer;
-import sinalgo.runtime.Runtime;
-import sinalgo.runtime.events.TimerEvent;
+import sinalgo.nodes.messages.NackBox;
+import sinalgo.runtime.Global;
 import sinalgo.tools.Tools;
 
 public class NodeEtxBet extends Node {
@@ -66,6 +63,9 @@ public class NodeEtxBet extends Node {
 	//Flag para indicar se o nodo ja enviou seu pkt hello
 	private boolean sentMyHello;
 	
+	//Flag para indicar que o nodo recebeu um Ack
+	private boolean rcvAck;
+	
 	//Flag para indicar se o nodo ja enviou seu pkt border
 	private boolean sentMyReply;
 	
@@ -97,9 +97,10 @@ public class NodeEtxBet extends Node {
 	
 	//ESTATISTICAS
 	private int countMsgAggr = 0;
-	private int count_rcv_ev_sink = 0;
-	private static int count_all_pkt_sent = 0;
-	private static int count_all_ev_sent = 0;
+	private int count_rcv_ev_sink = 0;	//quantidade de mensagens eventos recebidas pelo sink
+	private static int count_all_msg_sent = 0; //numero de mensagens enviadas
+	private static int count_all_pkt_sent = 0; //numero de broadcasts
+	private static int count_all_ev_sent = 0;  //numero de eventos
 	private static int NumberNodes = 0; // numero total de nos
 	private static int ev = 0;			// % de nodes que vao emitir eventos
 	private static int nNodesEv = 0; //numero de nos que vao emitir eventos
@@ -124,20 +125,25 @@ public class NodeEtxBet extends Node {
 	public void handleMessages(Inbox inbox) {
 		while (inbox.hasNext()) {
 			Message msg = inbox.next();
-			
 			if (msg instanceof PackHelloEtxBet) {
 				PackHelloEtxBet a = (PackHelloEtxBet) msg;
 				handlePackHello(a);
+				energySpentByNode += cr;
 			}else if (msg instanceof PackReplyEtxBet) {
 				PackReplyEtxBet b = (PackReplyEtxBet) msg;
 				handlePackReply(b);
+				energySpentByNode += cr;
 			}else if(msg instanceof PackEventEtxBet) {
-				PackEventEtxBet d = (PackEventEtxBet) msg;
-				handlePackEvent(d);
+				PackEventEtxBet c = (PackEventEtxBet) msg;
+				handlePackEvent(c);
+				energySpentByNode += cr;
 				energySpentByEvent += cr;
+			}else if(msg instanceof PackAckEtxBet) {
+				PackAckEtxBet d = (PackAckEtxBet) msg;
+				handlePackAck(d);
 			}
 			
-			energySpentByNode += cr;
+			
 		}
 	}
 	
@@ -206,7 +212,7 @@ public class NodeEtxBet extends Node {
 			// nodos do tipo border e relay devem enviar tal pacote
 			if(!isSentMyReply()){
 				
-				srf.startRelative((double) waitingTime(), this);
+				srf.startAbsolute((double) waitingTime(), this);
 				//srf.startRelative(getHops()*2, this);
 				//srf.startRelative(getHops()*3+200, this);
 				setSentMyReply(true);
@@ -231,12 +237,13 @@ public class NodeEtxBet extends Node {
 	}
 	
 	public void fwdHelloPack() {
-		// Encaminha um pacote com as informa�oes atualizadas
+		// Encaminha um pacote com as informacoes atualizadas
 		broadcast(new PackHelloEtxBet(hops, pathsToSink, this.ID, sinkID, etxPath)); 
 		setSentMyHello(true);
 		
 		//ESTATISTICA
 		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+		setCount_all_msg_sent(getCount_all_msg_sent() + 1);
 		
 		energySpentByNode += cf + y * Math.pow(range, alfa);
 	}
@@ -268,6 +275,7 @@ public class NodeEtxBet extends Node {
 			
 			//ESTATISTICA
 			setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+			setCount_all_msg_sent(getCount_all_msg_sent() + 1);
 			
 			energySpentByNode += cf + y * Math.pow(range, alfa);
 		}
@@ -276,9 +284,9 @@ public class NodeEtxBet extends Node {
 	public double waitingTime () {//atraso para enviar o pacote [referencia artigo do Eduardo]
 		double waitTime = 0.0;
 		//waitTime = 1 / (Math.exp(this.hops) * Math.pow(10, -20));
-		waitTime = 1 / (this.hops * (Math.pow(10, -3.3)));
-		System.out.println(waitTime);
-		return waitTime;
+		//waitTime = 1 / (this.hops * (Math.pow(5, -3.3)));
+		waitTime = Math.pow(5, 3.3) / this.hops;
+		return waitTime+100; //o flood somente inicia apos o tempo 100
 	}
 	
 	/*=============================================================
@@ -323,8 +331,10 @@ public class NodeEtxBet extends Node {
 		// Uma mensagem foi recebida pelos ancestrais logo devo analisar se e o meu nextHop
 		if (message.getETX() + etxToNode < getEtxPath()){	
 			if (message.getsBet() > getNeighborMaxSBet()) {
+				//System.out.println("Antes\n"+this);
 				setNeighborMaxSBet(message.getsBet());
 				setNextHop(message.getSenderID());
+				//System.out.println("Depois\n"+this+"\n\n");
 			}
 			message = null;
 		}
@@ -379,6 +389,11 @@ public class NodeEtxBet extends Node {
 				return;
 			}else{
 				System.out.println("aceitou um pacote");
+				
+				broadcast(new PackAckEtxBet(message.getPreviousHop()));
+				
+				energySpentByNode += cr;
+				energySpentByEvent += cr;
 			}
 		}
 		
@@ -398,7 +413,7 @@ public class NodeEtxBet extends Node {
 			
 			message.setnHop(nextHop); // modifica quem e o proximo hop
 			//setCountMsgAggr(getCountMsgAggr() + 1);
-			fwdEvent( message);
+			fwdEvent(message);
 		}else if(message.getnHop() == this.ID){
 			
 			//setCountMsgAggr(getCountMsgAggr() + 1);
@@ -447,6 +462,10 @@ public class NodeEtxBet extends Node {
 		PackEventEtxBet pktEv = new PackEventEtxBet(this.ID, sinkID, nextHop, this.ID);
 		broadcast(pktEv);
 		
+		ResendEventEtxBet re = new ResendEventEtxBet();
+		re.startRelative(4, this);
+		
+		
 		//ESTATISTICA
 		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
 		setCount_all_ev_sent(getCount_all_ev_sent() + 1);	
@@ -455,6 +474,33 @@ public class NodeEtxBet extends Node {
 		
 		energySpentByEvent += cf + y * Math.pow(range, alfa);
 	}
+	
+	public void resendEvent(){
+		if(!isRcvAck()){
+			sendEvent();
+		}
+	}
+	
+	public void startEvent(){
+		setRcvAck(false);
+		sendEvent();
+	}
+	
+	/*=============================================================
+	 *                 Manipulando o pacote Ack
+	 * ============================================================
+	 */
+	
+	public void handlePackAck(PackAckEtxBet message){
+		if(this.ID == 1){
+			return;
+		}
+		
+		if(message.getDestination() == this.ID){
+			setRcvAck(true);
+		}
+	}
+	 
 	
 	@Override
 	public void preStep() {
@@ -470,6 +516,7 @@ public class NodeEtxBet extends Node {
 		setNextHop(Integer.MAX_VALUE);
 		setNeighborMaxSBet(Double.MIN_VALUE);
 		setEtxPath(Double.MAX_VALUE);
+		setRcvAck(false);
 		setSentMyReply(false);
 		setSentMyHello(false);
 		setInAggregation(false);
@@ -495,7 +542,7 @@ public class NodeEtxBet extends Node {
 			readConfigurationParameters();
 		}
 		
-		if(setNodesEv.contains(this.ID)){
+		/*if(setNodesEv.contains(this.ID)){
 			StartEventEtxBet se = new StartEventEtxBet();
 			int time = gerador.nextInt(1000) + 2020;
 			System.out.println(this.ID+" emitiriar evento em: "+time);
@@ -508,7 +555,7 @@ public class NodeEtxBet extends Node {
 //				se.startRelative(time+i, this);
 //				
 //			}
-		}
+		}*/
 		
 	}
 	
@@ -824,6 +871,23 @@ public class NodeEtxBet extends Node {
 	public static void setEnergySpentByEvent(double energySpentByEvent) {
 		NodeEtxBet.energySpentByEvent = energySpentByEvent;
 	}
+
+	public static int getCount_all_msg_sent() {
+		return count_all_msg_sent;
+	}
+
+	public static void setCount_all_msg_sent(int count_all_msg_sent) {
+		NodeEtxBet.count_all_msg_sent = count_all_msg_sent;
+	}
+
+	public boolean isRcvAck() {
+		return rcvAck;
+	}
+
+	public void setRcvAck(boolean rcvAck) {
+		this.rcvAck = rcvAck;
+	}
+	
 	
 	
 	

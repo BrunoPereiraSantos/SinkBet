@@ -18,6 +18,7 @@ public class PackEventEtxBet extends Message {
 		this.destination = destination;
 		this.nHop = nHop;
 		this.previousHop = previousHop;
+
 	}
 
 	@Override
