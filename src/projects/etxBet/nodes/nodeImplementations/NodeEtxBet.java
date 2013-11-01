@@ -65,11 +65,11 @@ public class NodeEtxBet extends Node {
 	//Flag para indicar se o nodo ja enviou seu pkt hello
 	private boolean sentMyHello;
 	
-	//Flag para indicar que o nodo recebeu um Ack
-	private boolean rcvAck;
-	
 	//Flag para indicar se o nodo ja enviou seu pkt border
 	private boolean sentMyReply;
+	
+	//Flag para indicar que o nodo recebeu um Ack
+	private boolean rcvAck;
 	
 	//Flag para indicar se o nodo esta em periodo de agregacao
 	private boolean inAggregation;
@@ -290,6 +290,7 @@ public class NodeEtxBet extends Node {
 		//waitTime = 1 / (Math.exp(this.hops) * Math.pow(10, -20));
 		//waitTime = 1 / (this.hops * (Math.pow(5, -3.3)));
 		waitTime = Math.pow(5, 3.3) / this.hops;
+		//System.out.println(waitTime);
 		return waitTime+100; //o flood somente inicia apos o tempo 100
 	}
 	
@@ -434,8 +435,10 @@ public class NodeEtxBet extends Node {
 			setInAggregation(true);
 			
 			message.setnHop(nextHop); // modifica quem e o proximo hop
+			message.setPreviousHop(this.ID); //modifica qm foi o ultimo a enviar
 			
 			LoadAggregationEtxBet la = new LoadAggregationEtxBet(message);
+			
 			//setCountMsgAggr(getCountMsgAggr() + 1);
 			la.startRelative(getIntervalAggr(), this); //getIntervalAggr() e o tempo para esperar por mensagens a ser agregadas
 		}else if(message.getnHop() == this.ID){
@@ -456,8 +459,6 @@ public class NodeEtxBet extends Node {
 		
 		// comentar essa linha se quiser saber quantas mensagens cada nodo agregou
 		//setCountMsgAggr(0); 
-		
-		message.setPreviousHop(this.ID); //modifica qm foi o ultimo a enviar
 		
 		setRcvAck(false);
 		
