@@ -6,23 +6,41 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import sinalgo.configuration.Configuration;
+import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.models.DistributionModel;
 import sinalgo.nodes.Position;
+import sinalgo.tools.Tools;
 
 public class ReadTopology extends DistributionModel {
 
 	public static int index = 1;
+	public int idTopology, dimX, dimY, NumberNodes;
 	
 	@Override
 	public Position getNextPosition() {
 		// TODO Auto-generated method stub
+		if(index == 1){
+			try {
+				NumberNodes = Configuration.getIntegerParameter("NumberNodes");
+				idTopology = Configuration.getIntegerParameter("idTopology");
+				//System.out.println(NumberNodes);
+				//System.out.println(ev);
+			} catch (CorruptConfigurationEntryException e) {
+				Tools.fatalError("Alguma das variaveis (NumberNodes, dimX, dimY, idTopology) nao estao presentes no arquivo de configuracao ");
+			}
+		}
+		
 		try {  
 	        Process p = Runtime.getRuntime().exec("pwd");
 	        BufferedReader stdInput = new BufferedReader(new  InputStreamReader(p.getInputStream()));
 	        String s;
 	        if((s = stdInput.readLine()) != null){
-	        	s += "/topologias/";
-	        	s += "Topology2.txt";
+	        	s += "/topology/";
+	    		s += idTopology;
+	    		s += "_"+Configuration.dimX+"X"+Configuration.dimY;
+	    		s += "_"+NumberNodes;
+	    		s += "_topology.txt";
 	        	File arquivo = new File(s);
 	        	
 	        	if (!arquivo.exists()) {
