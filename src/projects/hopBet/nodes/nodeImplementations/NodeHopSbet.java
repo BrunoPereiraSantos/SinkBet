@@ -548,7 +548,7 @@ public class NodeHopSbet extends Node {
 			this.setColor(Color.BLUE);
 			setRole(NodeRoleHopSbet.SINK);
 			
-			(new StartSimulation()).startRelative(2, this);
+			(new StartSimulation()).startRelative(3, this);
 			
 			/*SendPackHelloHopSbet pkt = new SendPackHelloHopSbet(hops, 1, this.ID, this.ID);
 			pkt.startRelative(2, this);*/
@@ -630,17 +630,17 @@ public class NodeHopSbet extends Node {
 	}
 
 
-	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {
-		Integer a = new Integer(hops);
-		
-		String str = Integer.toString(this.ID) + "|" + Integer.toString(a) + "|" + pathsToSink;
-		/*str = str.concat("|" + getTotalLostPackets() + " " + getTotalLostPacktetsByMe());
-		str = str.concat("|" + getTotalPacktesSent() + " " + getTotalSentByMe());*/
-		if(this.ID == 1){
-			str +=  "|" + count_rcv_ev_sink;
-		}
-		super.drawNodeAsDiskWithText(g, pt, highlight, str, 7, Color.YELLOW);
-	}
+//	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {
+//		Integer a = new Integer(hops);
+//		
+//		String str = Integer.toString(this.ID) + "|" + Integer.toString(a) + "|" + pathsToSink;
+//		/*str = str.concat("|" + getTotalLostPackets() + " " + getTotalLostPacktetsByMe());
+//		str = str.concat("|" + getTotalPacktesSent() + " " + getTotalSentByMe());*/
+//		if(this.ID == 1){
+//			str +=  "|" + count_rcv_ev_sink;
+//		}
+//		super.drawNodeAsDiskWithText(g, pt, highlight, str, 7, Color.YELLOW);
+//	}
 
 	public String toString() {
 

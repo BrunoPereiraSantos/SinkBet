@@ -43,15 +43,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.lang.Math;
+
 import javax.swing.JOptionPane;
+
 import projects.defaultProject.models.reliabilityModels.LossyDelivery;
+import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
 import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeRoleHopSbet;
+import sinalgo.configuration.Configuration;
+import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.runtime.AbstractCustomGlobal;
+import sinalgo.runtime.Global;
 import sinalgo.runtime.Runtime;
 import sinalgo.tools.Tools;
 import sinalgo.tools.logging.Logging;
@@ -82,12 +92,22 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	
 	
 	private Logging myLogHopSbet;
+	private int NumberNodes = 0, idTopology = 0;
+	
 	
 	public void preRun() {
 		// colocar true como segundo parametro (append) quando for rodar mais simulacoes
 		// usa o arquivo que está no config.xml
 		myLogHopSbet = Logging.getLogger("logHopSbet.txt", true);	// false caso for ler estes valores pelo CTDistribuido
 		
+		try {
+			NumberNodes = Configuration.getIntegerParameter("NumberNodes");
+			idTopology = Configuration.getIntegerParameter("idTopology");
+			//System.out.println(NumberNodes);
+			//System.out.println(ev);
+		} catch (CorruptConfigurationEntryException e) {
+			Tools.fatalError("Alguma das variaveis (NumberNodes, idTopology) nao estao presentes no arquivo de configuracao ");
+		}
 	}
 	
 	public void onExit() {
@@ -176,6 +196,78 @@ public class CustomGlobal extends AbstractCustomGlobal{
 //				}
 //			}
 //		}
+	}
+	
+	
+	public void postRound(){
+		if(Global.currentTime == 1){
+			
+			try {  
+		        Process p = java.lang.Runtime.getRuntime().exec("pwd");
+		        BufferedReader stdInput = new BufferedReader(new  InputStreamReader(p.getInputStream()));
+		        String s;
+		        
+		        if((s = stdInput.readLine()) != null){
+		        	s += "/topology/";
+		    		s += idTopology;
+		    		s += "_"+Configuration.dimX+"X"+Configuration.dimY;
+		    		s += "_"+NumberNodes;
+		    		s += "_conection.txt";
+		        	File arquivo = new File(s);
+		        	
+		        	if (!arquivo.exists()) {
+		        		System.out.println("Erro arquivo nao existe"); 
+	        		}
+		        	
+		        	//faz a leitura do arquivo
+		        	FileReader fr = new FileReader(arquivo);
+		        	 
+		        	BufferedReader br = new BufferedReader(fr);
+		        	
+		        	//equanto houver mais linhas
+		        	while (br.ready()) {
+		        		//lê a proxima linha
+		        		
+		        		String linha = br.readLine();
+			        	String[] vet = linha.split(" ");
+			        	//System.out.println(vet[0]+" "+vet[1]+"   "+vet[2]);
+			        	int id_u, id_v;
+			        	id_u = Integer.parseInt(vet[0]);
+			        	id_v = Integer.parseInt(vet[1]);
+			        	double etx;
+			        	etx = Double.parseDouble(vet[2]);
+			        	
+			        	System.out.println(id_u+" "+id_v+"    "+etx);
+		        		
+		        		Node u, v;
+		        		u = Tools.getNodeByID(id_u);
+		        		v = Tools.getNodeByID(id_v);
+		        		
+		        		Iterator<Edge> it = u.outgoingConnections.iterator();
+		        		
+		        		while(it.hasNext()){
+		        			EdgeWeightHopSbet e = (EdgeWeightHopSbet) it.next();
+		        			if(e.startNode.equals(u) && e.endNode.equals(v)){
+		        				e.setETX(etx);
+		        			}
+		        		}
+		        		
+		        		
+		        		//faz algo com a linha
+		        		//System.out.println(id_u+" "+id_v+"   "+etx);
+		        		
+		        	}
+		        	
+		        	
+		        	br.close();
+		        	fr.close();
+		        }
+		       
+		    } catch(Exception e) {  
+		        System.out.println(e.toString());  
+		        e.printStackTrace();  
+		    }  
+		}
 	}
 	
 	/* (non-Javadoc)

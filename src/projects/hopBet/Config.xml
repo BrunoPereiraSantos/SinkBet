@@ -252,7 +252,7 @@
 		<NumberNodes value="200"/>		
 		<EV value="50"/>								
 		<intervalAggr value="10.0"/>	
-																								
-																					</Custom>
+		<idTopology value="0"/>															
+</Custom>
 </Document>
 

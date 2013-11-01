@@ -1,4 +1,4 @@
-package projects.Distribution.models.distributionModels;
+package projects.hopBet.models.distributionModels;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +12,6 @@ import sinalgo.nodes.Position;
 import sinalgo.tools.Tools;
 
 public class ReadTopology extends DistributionModel {
-
 	public static int index = 1;
 	public int idTopology, dimX, dimY, NumberNodes;
 	
@@ -93,5 +92,6 @@ public class ReadTopology extends DistributionModel {
 	    }  
 		return null;
 	}
+
 
 }

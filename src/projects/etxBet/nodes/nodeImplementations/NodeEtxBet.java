@@ -585,7 +585,7 @@ public class NodeEtxBet extends Node {
 			this.setColor(Color.BLUE);
 			setRole(NodeRoleEtxBet.SINK);
 			
-			(new StartSimulationEtxBet()).startRelative(2, this);
+			(new StartSimulationEtxBet()).startRelative(3, this);
 			
 			/*SendPackHelloEtxBet pkt = new SendPackHelloEtxBet(hops, 1, this.ID, this.ID);
 			pkt.startRelative(2, this);*/

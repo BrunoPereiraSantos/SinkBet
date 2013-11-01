@@ -82,7 +82,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	
 	private Logging Topology;
 	private Logging conectionEtx;
-	private int NumberNodes = 0, dimX = 0, dimY = 0, idTopology = 0;
+	private int NumberNodes = 0, idTopology = 0;
 	
 	public void preRun() {
 		
@@ -92,7 +92,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 			//System.out.println(NumberNodes);
 			//System.out.println(ev);
 		} catch (CorruptConfigurationEntryException e) {
-			Tools.fatalError("Alguma das variaveis (NumberNodes, dimX, dimY, idTopology) nao estao presentes no arquivo de configuracao ");
+			Tools.fatalError("Alguma das variaveis (NumberNodes, idTopology) nao estao presentes no arquivo de configuracao ");
 		}
 		
 		String str = "";
