@@ -8,10 +8,10 @@
 		<dimensions value="2" />
 
 		<!--Length of the deployment field along the x-axis.-->
-		<dimX value="200" />
+		<dimX value="300" />
 
 		<!--Length of the deployment field along the y-axis.-->
-		<dimY value="200" />
+		<dimY value="300" />
 
 		<!--Length of the deployment field along the z-axis.-->
 		<dimZ value="500" />
@@ -254,6 +254,6 @@
 									
 <intervalAggr value="10.0"/>	
 
-																																																																						</Custom>
+																																																																													</Custom>
 </Document>
 

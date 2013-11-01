@@ -139,6 +139,8 @@ public class NodeEtxBet extends Node {
 			}else if(msg instanceof PackEventEtxBet) {
 				PackEventEtxBet c = (PackEventEtxBet) msg;
 				handlePackEvent(c);
+				energySpentByEvent += cr;	
+				energySpentTotal += cr;
 			}else if(msg instanceof PackAckEtxBet) {
 				PackAckEtxBet d = (PackAckEtxBet) msg;
 				handlePackAck(d);
@@ -400,8 +402,8 @@ public class NodeEtxBet extends Node {
 				
 				//o tratamento de mensagens recebidas
 				//do tipo evendo foi colocado no handleEvent
-				energySpentByEvent += cr;	
-				energySpentTotal += cr;	
+				//energySpentByEvent += cr;	
+				//energySpentTotal += cr;	
 			}
 		}
 		
@@ -447,7 +449,7 @@ public class NodeEtxBet extends Node {
 			setCount_all_msg_aggr(getCount_all_msg_aggr() + 1);
 			
 			System.out.println(this.ID+" agregou "+getCountMsgAggr());
-			message = null;	// todas as mensgagens agregadas sao descartadas
+			message = null;	// todas as mensgagens agregadas sao "descartadas"
 		}
 	}
 	
@@ -594,7 +596,7 @@ public class NodeEtxBet extends Node {
 			readConfigurationParameters();
 		}
 		
-		/*if(setNodesEv.contains(this.ID)){
+		if(setNodesEv.contains(this.ID)){
 			StartEventEtxBet se = new StartEventEtxBet();
 			int time = gerador.nextInt(1000) + 2020;
 			System.out.println(this.ID+" emitiriar evento em: "+time);
@@ -607,7 +609,7 @@ public class NodeEtxBet extends Node {
 //				se.startRelative(time+i, this);
 //				
 //			}
-		}*/
+		}
 		
 	}
 	

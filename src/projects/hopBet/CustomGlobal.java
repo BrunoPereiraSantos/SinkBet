@@ -38,18 +38,14 @@ package projects.hopBet;
 
 
 import java.awt.Color;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Vector;
 import java.lang.Math;
-
 import javax.swing.JOptionPane;
-
 import projects.defaultProject.models.reliabilityModels.LossyDelivery;
-import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
-import projects.etxBet.nodes.nodeImplementations.NodeEtxBet;
 import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeRoleHopSbet;
@@ -96,21 +92,25 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	
 	public void onExit() {
 		int numberOfNodes = Tools.getNodeList().size();
+		DecimalFormat format = new DecimalFormat();  
+	    format.setMaximumFractionDigits(3);  
+	    format.setMinimumFractionDigits(3);
 		String str = "";
-		NodeHopSbet n = (NodeHopSbet) Tools.getNodeByID(1);
-		int numberOfPktRcvSink = n.getCount_rcv_ev_sink();
 		
 		str += "N=" + numberOfNodes;
-		str += " rcvSink="+numberOfPktRcvSink;
-		str += " allPkt="+NodeHopSbet.getCount_all_pkt_sent();
+		str += " rcvSink="+NodeHopSbet.getCount_rcv_ev_sink();
+		str += " allMsg_HeR="+NodeHopSbet.getCount_all_msg_sent();
+		str += " allPkt="+NodeHopSbet.getCount_all_broadcast();
 		str += " AllpktEv=" + NodeHopSbet.getCount_all_ev_sent();
+		//str += " PktAggr=" + NodeHopSbet.getCount_all_msg_aggr();
+		str += " PktAggr=" + (NodeHopSbet.getCount_all_ev_sent() - NodeHopSbet.getCount_rcv_ev_sink());
 		str += " intervalAggr=" + NodeHopSbet.getIntervalAggr();
 		str += " ev=" + NodeHopSbet.getEv();
 		str += " nNodesEv=" + NodeHopSbet.getnNodesEv();
 		str += " NumberNodes=" + NodeHopSbet.getNumberNodes();
 		str += " PktDrop=" + NodeHopSbet.getCountDropPkt();
-		str += " Energy=" + NodeHopSbet.getEnergySpentByNode();
-		str += " EnergyEvent=" + NodeHopSbet.getEnergySpentByEvent();
+		str += " Energy=" + format.format(NodeHopSbet.getEnergySpentTotal());
+		str += " EnergyEvent=" + format.format(NodeHopSbet.getEnergySpentByEvent());
 		
 		myLogHopSbet.logln(str);
 		

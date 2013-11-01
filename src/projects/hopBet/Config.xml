@@ -8,10 +8,10 @@
 		<dimensions value="2" />
 
 		<!--Length of the deployment field along the x-axis.-->
-		<dimX value="1000" />
+		<dimX value="200" />
 
 		<!--Length of the deployment field along the y-axis.-->
-		<dimY value="1000" />
+		<dimY value="200" />
 
 		<!--Length of the deployment field along the z-axis.-->
 		<dimZ value="500" />
@@ -29,7 +29,7 @@
 		<interference value="false" />
 
 		<!--Set this flag to true if interference only decreases if fewer messages are being sent and increases if more messages are being sent. If this flag is NOT set, interference for all messages currently being sent is reevaluated whenever a new message is being sent, and whenever a message stops being sent. When this flag is set, interference tests are reduced to a minimum, using the additivity property. This flag only affects the asynchronous mode. In synchronous mode, interference is checked exactly once for every message in every round.-->
-		<interferenceIsAdditive value="true" />
+		<interferenceIsAdditive value="false" />
 
 		<!--Set this flag to true if a node can receive messages while it is sending messages itself, otherwise to false. This flag is only relevant if interference is turned on, and it must be handled properly in the used interference model.-->
 		<canReceiveWhileSending value="false" />
@@ -231,7 +231,7 @@
 
 		<GeometricNodeCollection rMax="100"/>
 		
-		<UDG rMax="100"/>
+		<UDG rMax="30"/>
 		
 		<SINR alpha="2" beta="0.7" noise="0"/>
 		
@@ -253,6 +253,6 @@
 		<EV value="50"/>								
 		<intervalAggr value="10.0"/>	
 																								
-														</Custom>
+																					</Custom>
 </Document>
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sinalgo>
 	<ProjectSelector windowWidth="590" windowHeight="370" lastChosenProject="hopBet" windowPosX="0" windowPosY="24" isMaximized="true" selectedTab="2" />
-	<GUI windowWidth="683" windowHeight="715" windowPosX="690" windowPosY="220" isMaximized="false" ControlPanelExpandSimulation="true" ControlPanelShowFullViewPanel="false" ControlPanelShowTextPanel="true" ControlPanelShowProjectControl="true" RunOperationIsLimited="true" helpWindowWidth="500" helpWindowHeight="500" helpWindowPosX="200" helpWindowPosY="200" helpWindowIsMaximized="false" />
-	<RandomSeed seedFromPreviousRun="4519075802843947914" />
-	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="true" updateCheckTimeStamp="1383254886981" runCmdLineArgs="" />
-	<GenNodesDlg numNodes="200" />
+	<GUI windowWidth="960" windowHeight="1027" windowPosX="961" windowPosY="52" isMaximized="false" ControlPanelExpandSimulation="true" ControlPanelShowFullViewPanel="false" ControlPanelShowTextPanel="true" ControlPanelShowProjectControl="true" RunOperationIsLimited="true" helpWindowWidth="500" helpWindowHeight="500" helpWindowPosX="200" helpWindowPosY="200" helpWindowIsMaximized="false" />
+	<RandomSeed seedFromPreviousRun="-1367811770386310870" />
+	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="true" updateCheckTimeStamp="1383254886981" runCmdLineArgs="-batch -project hopBet -gen 500 hopBet:NodeHopSbet Random -rounds 5000 -overwrite NumberNodes=500 EV=50 intervalAggr=10 dimX=200 dimY=200 " />
+	<GenNodesDlg numNodes="1024" />
 </sinalgo>
 

@@ -41,13 +41,10 @@ import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
 import java.lang.Math;
-
 import javax.swing.JOptionPane;
-
 import projects.defaultProject.models.reliabilityModels.LossyDelivery;
 import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
 import projects.etxBet.nodes.nodeImplementations.NodeEtxBet;
@@ -55,7 +52,6 @@ import projects.etxBet.nodes.nodeImplementations.NodeRoleEtxBet;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.runtime.AbstractCustomGlobal;
-import sinalgo.runtime.Global;
 import sinalgo.runtime.Runtime;
 import sinalgo.tools.Tools;
 import sinalgo.tools.logging.Logging;

@@ -95,10 +95,12 @@ public class NodeHopSbet extends Node {
 	
 	
 	//ESTATISTICAS
-	private int countMsgAggr = 0;
-	private int count_rcv_ev_sink = 0;
-	private static int count_all_pkt_sent = 0;
-	private static int count_all_ev_sent = 0;
+	private int countMsgAggr = 0;		// numero de mensagens que foram agregadas em cada nodo
+	private static int count_all_msg_aggr = 0;		// numero de mensagens que foram agregadas
+	private static int count_rcv_ev_sink = 0;	//quantidade de mensagens eventos recebidas pelo sink
+	private static int count_all_msg_sent = 0; //numero de mensagens enviadas
+	private static int count_all_broadcast = 0; //numero de broadcasts
+	private static int count_all_ev_sent = 0;  //numero de eventos
 	private static int NumberNodes = 0; // numero total de nos
 	private static int ev = 0;			// % de nodes que vao emitir eventos
 	private static int nNodesEv = 0; //numero de nos que vao emitir eventos
@@ -117,7 +119,7 @@ public class NodeHopSbet extends Node {
 	private static final double alfa = 2;
 	private static final double range = 30;
 	
-	private static double energySpentByNode = 0;
+	private static double energySpentTotal = 0;
 	private static double energySpentByEvent = 0;
 	
 	@Override
@@ -128,22 +130,24 @@ public class NodeHopSbet extends Node {
 			if (msg instanceof PackHelloHopSbet) {
 				PackHelloHopSbet a = (PackHelloHopSbet) msg;
 				handlePackHello(a);
+				energySpentTotal += cr;
 			}else if (msg instanceof PackReplyHopSbet) {
 				PackReplyHopSbet b = (PackReplyHopSbet) msg;
 				handlePackReply(b);
+				energySpentTotal += cr;
 			}else if(msg instanceof PackEventHopSbet) {
 				PackEventHopSbet c = (PackEventHopSbet) msg;
 				handlePackEvent(c);
-				
-				energySpentByEvent += cr;
+				energySpentByEvent += cr;	
+				energySpentTotal += cr;
 			}else if(msg instanceof PackAckHopSbet) {
 				PackAckHopSbet d = (PackAckHopSbet) msg;
 				handlePackAck(d);
-				
-				energySpentByEvent += cr;
 			}
-			
-			energySpentByNode += cr;
+			// o custo foi colocado em cada if
+			// pois o tratamento de perda de pacotes foi colocado
+			// no handleEvent, logo nem toda mensagem que passa por aqui
+			// deve ser contabilizada como mensagem recebida
 		}
 	}
 	
@@ -213,9 +217,10 @@ public class NodeHopSbet extends Node {
 		setSentMyHello(true);
 		
 		//ESTATISTICA
-		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+		setCount_all_broadcast(getCount_all_broadcast() + 1);
+		setCount_all_msg_sent(getCount_all_msg_sent() + 1);
 		
-		energySpentByNode += cf + y * Math.pow(range, alfa);
+		energySpentTotal += cf + y * Math.pow(range, alfa);
 	}
 	
 	public void sendHelloFlooding() {
@@ -224,9 +229,10 @@ public class NodeHopSbet extends Node {
 		setSentMyHello(true);
 		
 		//ESTATISTICA
-		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+		setCount_all_broadcast(getCount_all_broadcast() + 1);
+		setCount_all_msg_sent(getCount_all_msg_sent() + 1);
 		
-		energySpentByNode += cf + y * Math.pow(range, alfa);
+		energySpentTotal += cf + y * Math.pow(range, alfa);
 	}
 
 	public void sendReplyFlooding(){ //Dispara o flooding das respostas dos nodos com papel BORDER e RELAY
@@ -241,9 +247,10 @@ public class NodeHopSbet extends Node {
 			setSentMyReply(true);
 			
 			//ESTATISTICA
-			setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+			setCount_all_broadcast(getCount_all_broadcast() + 1);
+			setCount_all_msg_sent(getCount_all_msg_sent() + 1);
 			
-			energySpentByNode += cf + y * Math.pow(range, alfa);
+			energySpentTotal += cf + y * Math.pow(range, alfa);
 		}
 	}
 	
@@ -330,9 +337,9 @@ public class NodeHopSbet extends Node {
 		broadcast(pkt);
 		
 		//ESTATISTICA
-		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+		setCount_all_broadcast(getCount_all_broadcast() + 1);
 		
-		energySpentByNode += cf + y * Math.pow(range, alfa);
+		energySpentTotal += cf + y * Math.pow(range, alfa);
 	}
 	
 	
@@ -362,6 +369,10 @@ public class NodeHopSbet extends Node {
 				//envia um Ack para o nodo que envidou a mensagem
 				sendAck(message.getPreviousHop());
 				
+				//o tratamento de mensagens recebidas
+				//do tipo evendo foi colocado no handleEvent
+				//energySpentByEvent += cr;	
+				//energySpentTotal += cr;	
 			}
 		}
 		
@@ -399,9 +410,13 @@ public class NodeHopSbet extends Node {
 			la.startRelative(getIntervalAggr(), this); //getIntervalAggr() e o tempo para esperar por mensagens a ser agregadas
 			
 		}else if(message.getnHop() == this.ID){
+			//ESTATISTICA
 			setCountMsgAggr(getCountMsgAggr() + 1);
+			setCount_all_msg_aggr(getCount_all_msg_aggr() + 1);
 			System.out.println(this.ID+" agregou "+getCountMsgAggr());
-			message = null;	// todas as mensgagens agregadas sao descartadas
+			
+			
+			message = null;	// todas as mensgagens agregadas sao "descartadas"
 		}
 	}
 	
@@ -423,10 +438,9 @@ public class NodeHopSbet extends Node {
 		rfe.startRelative(4, this);
 		
 		//ESTATISTICA
-		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
+		setCount_all_broadcast(getCount_all_broadcast() + 1);
 		
-		
-		energySpentByNode += cf + y * Math.pow(range, alfa);
+		energySpentTotal += cf + y * Math.pow(range, alfa);
 		
 		energySpentByEvent += cf + y * Math.pow(range, alfa);
 	}
@@ -439,6 +453,12 @@ public class NodeHopSbet extends Node {
 			ReFwdEventHopSbet rfe = new ReFwdEventHopSbet(message);
 			rfe.startRelative(4, this);
 			
+			//ESTATISTICA
+			setCount_all_broadcast(getCount_all_broadcast() + 1);
+			
+			energySpentTotal += cf + y * Math.pow(range, alfa);
+			
+			energySpentByEvent += cf + y * Math.pow(range, alfa);
 		}else{
 			message = null;
 			return;
@@ -454,11 +474,9 @@ public class NodeHopSbet extends Node {
 		re.startRelative(4, this);
 		
 		//ESTATISTICA
-		setCount_all_pkt_sent(getCount_all_pkt_sent() + 1);
-		setCount_all_ev_sent(getCount_all_ev_sent() + 1);	
+		setCount_all_broadcast(getCount_all_broadcast() + 1);
 		
-		
-		energySpentByNode += cf + y * Math.pow(range, alfa);
+		energySpentTotal += cf + y * Math.pow(range, alfa);
 		
 		energySpentByEvent += cf + y * Math.pow(range, alfa);
 	}
@@ -541,7 +559,7 @@ public class NodeHopSbet extends Node {
 			readConfigurationParameters();
 		}
 		
-		/*if(setNodesEv.contains(this.ID)){
+		if(setNodesEv.contains(this.ID)){
 			StartEventHopSbet se = new StartEventHopSbet();
 			int time = gerador.nextInt(1000) + 2020;
 			System.out.println(this.ID+" emitiriar evento em: "+time);
@@ -554,7 +572,7 @@ public class NodeHopSbet extends Node {
 //				se.startRelative(time+i, this);
 //				
 //			}
-		}*/
+		}
 		
 	}
 	
@@ -724,21 +742,15 @@ public class NodeHopSbet extends Node {
 		this.gerador = gerador;
 	}
 
-	public int getCount_rcv_ev_sink() {
+	public static int getCount_rcv_ev_sink() {
 		return count_rcv_ev_sink;
 	}
 
-	public void setCount_rcv_ev_sink(int count_rcv_ev_sink) {
-		this.count_rcv_ev_sink = count_rcv_ev_sink;
+
+	public static void setCount_rcv_ev_sink(int count_rcv_ev_sink) {
+		NodeHopSbet.count_rcv_ev_sink = count_rcv_ev_sink;
 	}
 
-	public static int getCount_all_pkt_sent() {
-		return count_all_pkt_sent;
-	}
-
-	public static void setCount_all_pkt_sent(int count_all_pkt_sent) {
-		NodeHopSbet.count_all_pkt_sent = count_all_pkt_sent;
-	}
 
 	public static int getCount_all_ev_sent() {
 		return count_all_ev_sent;
@@ -812,13 +824,6 @@ public class NodeHopSbet extends Node {
 		NodeHopSbet.countDropPkt = countDropPkt;
 	}
 
-	public static double getEnergySpentByNode() {
-		return energySpentByNode;
-	}
-
-	public static void setEnergySpentByNode(double energySpentByNode) {
-		NodeHopSbet.energySpentByNode = energySpentByNode;
-	}
 
 	public static double getEnergySpentByEvent() {
 		return energySpentByEvent;
@@ -858,6 +863,46 @@ public class NodeHopSbet extends Node {
 		this.rcvAck = rcvAck;
 	}
 
+
+	public static int getCount_all_msg_aggr() {
+		return count_all_msg_aggr;
+	}
+
+
+	public static void setCount_all_msg_aggr(int count_all_msg_aggr) {
+		NodeHopSbet.count_all_msg_aggr = count_all_msg_aggr;
+	}
+
+
+	public static int getCount_all_msg_sent() {
+		return count_all_msg_sent;
+	}
+
+
+	public static void setCount_all_msg_sent(int count_all_msg_sent) {
+		NodeHopSbet.count_all_msg_sent = count_all_msg_sent;
+	}
+
+
+	public static int getCount_all_broadcast() {
+		return count_all_broadcast;
+	}
+
+
+	public static void setCount_all_broadcast(int count_all_broadcast) {
+		NodeHopSbet.count_all_broadcast = count_all_broadcast;
+	}
+
+
+	public static double getEnergySpentTotal() {
+		return energySpentTotal;
+	}
+
+
+	public static void setEnergySpentTotal(double energySpentTotal) {
+		NodeHopSbet.energySpentTotal = energySpentTotal;
+	}
+	
 	
 	
 }
