@@ -1,17 +1,18 @@
-package projects.ETX.nodes.edges;
+package projects.Distribution.nodes.edges;
 
 import sinalgo.nodes.edges.Edge;
 import sinalgo.tools.statistics.UniformDistribution;
 
-public class EdgeWeightETX extends Edge {
+public class EdgeETX extends Edge {
 	private double ETX;
 
-	
-	public EdgeWeightETX() {
+	/**
+	 * @param eTX
+	 */
+	public EdgeETX() {
 		super();
 		UniformDistribution cte = new UniformDistribution(1, 100);
 		setETX((int)cte.nextSample());
-		
 	}
 
 	public double getETX() {
@@ -21,11 +22,13 @@ public class EdgeWeightETX extends Edge {
 	public void setETX(double eTX) {
 		ETX = eTX;
 	}
-	
-	public String toString(){
-		String str = "ETX link = ";
-		str = str.concat(ETX+"");
-		return str;
+
+	@Override
+	public String toString() {
+		return "EdgeETX [ETX=" + ETX + "]";
 	}
+	
+	
+	
 	
 }
