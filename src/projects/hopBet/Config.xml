@@ -50,7 +50,7 @@
 		<refreshRate value="1" />
 
 		<!--If set to true, the framework will inform a sender whenever  a unicast message is dropped. In synchronous mode, the sender  is informed in the round after the message should have arrived, and  immediately upon arrival in asynchronous mode.-->
-		<generateNAckMessages value="false" />
+		<generateNAckMessages value="true" />
 
 		<!--This flag only affects the asynchronous simulation mode.  When set to true, the framework calls handleEmptyEventQueue  on the project specific CustomGlobal whenever the event queue  becomes empty.-->
 		<handleEmptyEventQueue value="true" />
@@ -137,7 +137,7 @@
 		<DefaultConnectivityModel value="UDG" />
 
 		<!--Default distribution model used when none is specified-->
-		<DefaultDistributionModel value="Random" />
+		<DefaultDistributionModel value="hopBet:ReadTopology" />
 
 		<!--Default interference model used when none is specified-->
 		<DefaultInterferenceModel value="NoInterference" />
@@ -146,10 +146,10 @@
 		<DefaultMobilityModel value="NoMobility" />
 
 		<!--Default reliability model used when none is specified-->
-		<DefaultReliabilityModel value="ReliableDelivery" />
+		<DefaultReliabilityModel value="hopBet:ReliabilityHopSbet" />
 
 		<!--Default node implementation used when none is specified-->
-		<DefaultNodeImplementation value="DummyNode" />
+		<DefaultNodeImplementation value="hopBet:NodeHopSbet" />
 
 		<!--Show the models implemented by all projects in the drop down options. When set to false, only the models by the selected project and the default project are shown.-->
 		<showModelsOfAllProjects value="false" />
@@ -253,6 +253,6 @@
 		<EV value="50"/>								
 		<intervalAggr value="10.0"/>	
 		<idTopology value="0"/>															
-		</Custom>
+			</Custom>
 </Document>
 

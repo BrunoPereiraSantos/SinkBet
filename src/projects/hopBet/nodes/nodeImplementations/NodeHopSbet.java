@@ -13,6 +13,11 @@ import java.util.Map.Entry;
 
 import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
 import projects.etxBet.nodes.messages.PackAckEtxBet;
+import projects.etxBet.nodes.messages.PackEventEtxBet;
+import projects.etxBet.nodes.messages.PackTeste;
+import projects.etxBet.nodes.nodeImplementations.NodeEtxBet;
+import projects.etxBet.nodes.timers.EncaminhaEvento;
+import projects.etxBet.nodes.timers.IniciaEvento;
 import projects.etxBet.nodes.timers.ReFwdEventExtBet;
 import projects.etxBet.nodes.timers.StartEventEtxBet;
 import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
@@ -20,6 +25,8 @@ import projects.hopBet.nodes.messages.PackAckHopSbet;
 import projects.hopBet.nodes.messages.PackEventHopSbet;
 import projects.hopBet.nodes.messages.PackHelloHopSbet;
 import projects.hopBet.nodes.messages.PackReplyHopSbet;
+import projects.hopBet.nodes.timers.EncaminhaEventoHopSbet;
+import projects.hopBet.nodes.timers.IniciaEventoHopSbet;
 import projects.hopBet.nodes.timers.LoadAggregation;
 import projects.hopBet.nodes.timers.ReFwdEventHopSbet;
 import projects.hopBet.nodes.timers.ResendEventHopSbet;
@@ -33,9 +40,11 @@ import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.Node.NodePopupMethod;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
+import sinalgo.nodes.messages.NackBox;
 import sinalgo.runtime.Global;
 import sinalgo.tools.Tools;
 
@@ -147,6 +156,13 @@ public class NodeHopSbet extends Node {
 				energySpentTotal += cr;
 			}else if(msg instanceof PackEventHopSbet) {
 				PackEventHopSbet c = (PackEventHopSbet) msg;
+				manipuladorEventos(c);
+				energySpentByEvent += cr;	
+				energySpentTotal += cr;
+			}
+			
+			/*else if(msg instanceof PackEventHopSbet) {
+				PackEventHopSbet c = (PackEventHopSbet) msg;
 				handlePackEvent(c);
 				energySpentByEvent += cr;	
 				energySpentTotal += cr;
@@ -155,7 +171,7 @@ public class NodeHopSbet extends Node {
 				handlePackAck(d);
 				energySpentTotal += cr;
 				energySpentByEvent += cr;
-			}
+			}*/
 			// o custo foi colocado em cada if
 			// pois o tratamento de perda de pacotes foi colocado
 			// no handleEvent, logo nem toda mensagem que passa por aqui
@@ -163,7 +179,70 @@ public class NodeHopSbet extends Node {
 		}
 	}
 	
+	public void manipuladorEventos(PackEventHopSbet message){
+		//mensagem chegou ate o sink, incrementa a quantidade de msg recebidas pelo sink
+		if((this.ID == message.getDestination()) && (message.getnHop() == this.ID)){
+			this.setColor(Color.PINK);
+			message = null;
 
+			//ESTATISTICA
+			setCount_rcv_ev_sink(getCount_rcv_ev_sink() + 1);
+			return;
+		}
+		
+		if(message.getnHop() == this.ID){
+			message.setnHop(nextHop);
+			message.setPreviousHop(this.ID);
+			EncaminhaEventoHopSbet ee = new EncaminhaEventoHopSbet(message);
+			ee.startRelative(1, this);
+		}
+		
+	}
+	
+	public void enviaEvent(){
+		broadcastEvent(new PackEventHopSbet(this.ID, sinkID, nextHop, this.ID));
+	}
+	
+	public void broadcastEvent(PackEventHopSbet message){
+		send(message, Tools.getNodeByID(nextHop));
+		
+		Iterator<Edge> it = this.outgoingConnections.iterator();
+		NodeHopSbet n;
+		EdgeWeightHopSbet e;
+		while(it.hasNext()){
+			e = (EdgeWeightHopSbet) it.next();
+			if(e.endNode.ID != nextHop){
+				//neste caso sempre os vizinhos escutam.
+				//Nao necessito enviar para todos os vizinhos
+				//pq vou receber um ack para cada perda
+				energySpentByEvent += cr;	
+				energySpentTotal += cr;
+			}
+		}
+	}
+	
+	public void handleNAckMessages(NackBox nackBox) {
+		
+		while(nackBox.hasNext()) {
+			Message msg = nackBox.next();
+			if(msg instanceof PackTeste) {
+				//handle this type of message
+				System.out.println(this.ID+" Entrei!!!!");
+				
+			}
+			
+			if(msg instanceof PackEventHopSbet){
+				System.out.println(this.ID+" contei!!!!");
+				countDropPkt++;
+				PackEventHopSbet p = (PackEventHopSbet) msg;
+				EncaminhaEventoHopSbet ee = new EncaminhaEventoHopSbet(p);
+				ee.startRelative(2, this);
+				
+			}
+		}
+	}
+	
+	
 	/*=============================================================
 	 *                 Manipulando o pacote Hello
 	 * ============================================================
@@ -557,11 +636,14 @@ public class NodeHopSbet extends Node {
 			}*/
 	
 			if(setNodesEv.contains(this.ID)){
-				StartEventHopSbet se = new StartEventHopSbet();
+				/*StartEventHopSbet se = new StartEventHopSbet();
 				timeEvent += 1000;
 				System.out.println(this.ID+" emitiriar evento em: "+timeEvent);
-				se.startRelative(timeEvent, this);
-				
+				se.startRelative(timeEvent, this);*/
+				IniciaEventoHopSbet ee = new IniciaEventoHopSbet();
+				timeEvent += 1000;
+				System.out.println(this.ID+" emitiriar evento em: "+timeEvent);
+				ee.startRelative(timeEvent, this);
 				
 	//			for(int i = 10; i < 300; i+=10){
 	//				se = new StartEvent();
@@ -664,6 +746,11 @@ public class NodeHopSbet extends Node {
 		
 	}
 
+	@NodePopupMethod(menuText = "Enviar teste")
+	public void enviarTest() {
+		EncaminhaEventoHopSbet ee = new EncaminhaEventoHopSbet(new PackEventHopSbet(this.ID, sinkID, nextHop, this.ID));
+		ee.startRelative(1, this);
+	}
 
 //	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {
 //		Integer a = new Integer(hops);
@@ -725,6 +812,17 @@ public class NodeHopSbet extends Node {
 		return 0.0;
 	}
 
+	public double getEtxToNode(int nodeID) {
+		Iterator<Edge> it2 = this.outgoingConnections.iterator();
+		EdgeWeightHopSbet e;
+		while (it2.hasNext()) {
+			e = (EdgeWeightHopSbet) it2.next();
+			if (e.endNode.ID == nodeID)
+				return e.getETX();
+		}
+		return 0.0;
+	}
+	
 	public boolean isSentMyHello() {
 		return sentMyHello;
 	}

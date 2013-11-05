@@ -137,7 +137,8 @@
 		<DefaultConnectivityModel value="UDG" />
 
 		<!--Default distribution model used when none is specified-->
-		<DefaultDistributionModel value="Random" />
+		<!-- <DefaultDistributionModel value="Random" /> -->
+		<DefaultDistributionModel value="etxBet:ReadTopology" />
 
 		<!--Default interference model used when none is specified-->
 		<DefaultInterferenceModel value="NoInterference" />
@@ -146,10 +147,13 @@
 		<DefaultMobilityModel value="NoMobility" />
 
 		<!--Default reliability model used when none is specified-->
-		<DefaultReliabilityModel value="ReliableDelivery" />
+		<!-- <DefaultReliabilityModel value="ReliableDelivery" /> -->
+		<DefaultReliabilityModel value="etxBet:ReliabilityEtxBet" />
+		
 
 		<!--Default node implementation used when none is specified-->
-		<DefaultNodeImplementation value="DummyNode" />
+		<!-- <DefaultNodeImplementation value="DummyNode" /> -->
+		<DefaultNodeImplementation value="etxBet:NodeEtxBet" />
 
 		<!--Show the models implemented by all projects in the drop down options. When set to false, only the models by the selected project and the default project are shown.-->
 		<showModelsOfAllProjects value="false" />

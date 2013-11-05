@@ -1,24 +1,24 @@
-package projects.etxBet.models.reliabilityModels;
+package projects.hopBet.models.reliabilityModels;
 
 import java.util.Random;
 
-import projects.etxBet.nodes.messages.PackEventEtxBet;
-import projects.etxBet.nodes.messages.PackTeste;
 import projects.etxBet.nodes.nodeImplementations.NodeEtxBet;
+import projects.hopBet.nodes.messages.PackEventHopSbet;
+import projects.hopBet.nodes.nodeImplementations.NodeHopSbet;
 import sinalgo.models.ReliabilityModel;
 import sinalgo.nodes.messages.Packet;
 
-public class ReliabilityEtxBet extends ReliabilityModel {
-
+public class ReliabilityHopSbet extends ReliabilityModel {
+	
 	//variavel para gerar numeros aleatorios
 	private Random gerador = new Random();
 	
 	@Override
 	public boolean reachesDestination(Packet p) {
 		// TODO Auto-generated method stub
-		if(p.message instanceof PackEventEtxBet){
-			NodeEtxBet nOrigin = (NodeEtxBet) p.origin;
-			NodeEtxBet nDest = (NodeEtxBet) p.destination;
+		if(p.message instanceof PackEventHopSbet){
+			NodeHopSbet nOrigin = (NodeHopSbet) p.origin;
+			NodeHopSbet nDest = (NodeHopSbet) p.destination;
 			
 			double prob = gerador.nextInt(100) + 1;
 			System.out.println("NO "+nDest.ID+ " gerou um probabilidade p = "+prob);
@@ -31,18 +31,8 @@ public class ReliabilityEtxBet extends ReliabilityModel {
 				System.out.println("NO "+nDest.ID+ " aceitou um pacote");
 				return true;
 			}
-			
-			/*
-			 * if(100 - getEtxToMeFromNode(message.getPreviousHop()) < p){
-				System.out.println("perdeu um pacote");
-				return;
-			}else{
-			 */
-			
-			/*p.denyDelivery();
-			
-			return false;*/
 		}
+			
 		
 		return true;
 	}

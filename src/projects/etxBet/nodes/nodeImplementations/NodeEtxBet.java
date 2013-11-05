@@ -17,6 +17,7 @@ import projects.etxBet.nodes.messages.PackHelloEtxBet;
 import projects.etxBet.nodes.messages.PackReplyEtxBet;
 import projects.etxBet.nodes.messages.PackTeste;
 import projects.etxBet.nodes.timers.EncaminhaEvento;
+import projects.etxBet.nodes.timers.IniciaEvento;
 import projects.etxBet.nodes.timers.LoadAggregationEtxBet;
 import projects.etxBet.nodes.timers.ReFwdEventExtBet;
 import projects.etxBet.nodes.timers.ResendEventEtxBet;
@@ -152,6 +153,8 @@ public class NodeEtxBet extends Node {
 			} else if(msg instanceof PackEventEtxBet) {
 				PackEventEtxBet c = (PackEventEtxBet) msg;
 				manipuladorEventos(c);
+				energySpentByEvent += cr;	
+				energySpentTotal += cr;
 			}
 			/*else if(msg instanceof PackEventEtxBet) {
 				PackEventEtxBet c = (PackEventEtxBet) msg;
@@ -184,14 +187,39 @@ public class NodeEtxBet extends Node {
 		}
 		
 		if(message.getnHop() == this.ID){
+			message.setnHop(nextHop);
+			message.setPreviousHop(this.ID);
 			EncaminhaEvento ee = new EncaminhaEvento(message);
 			ee.startRelative(1, this);
 		}
 		
 	}
 	
-	public void encaminhaEvento(PackEventEtxBet message){
+	/*public void encaminhaEvento(PackEventEtxBet message){
+		//send(message, Tools.getNodeByID(nextHop));
+		broadcastEvent(message);
+	}*/
+	
+	public void enviaEvent(){
+		broadcastEvent(new PackEventEtxBet(this.ID, sinkID, nextHop, this.ID));
+	}
+	
+	public void broadcastEvent(PackEventEtxBet message){
 		send(message, Tools.getNodeByID(nextHop));
+		
+		Iterator<Edge> it = this.outgoingConnections.iterator();
+		NodeEtxBet n;
+		EdgeWeightEtxBet e;
+		while(it.hasNext()){
+			e = (EdgeWeightEtxBet) it.next();
+			if(e.endNode.ID != nextHop){
+				//neste caso sempre os vizinhos escutam.
+				//Nao necessito enviar para todos os vizinhos
+				//pq vou receber um ack para cada perda
+				energySpentByEvent += cr;	
+				energySpentTotal += cr;
+			}
+		}
 	}
 	
 	public void handleNAckMessages(NackBox nackBox) {
@@ -205,9 +233,12 @@ public class NodeEtxBet extends Node {
 			}
 			
 			if(msg instanceof PackEventEtxBet){
+				System.out.println(this.ID+" contei!!!!");
+				countDropPkt++;
 				PackEventEtxBet p = (PackEventEtxBet) msg;
 				EncaminhaEvento ee = new EncaminhaEvento(p);
 				ee.startRelative(2, this);
+				
 			}
 		}
 	}
@@ -642,11 +673,14 @@ public class NodeEtxBet extends Node {
 			}*/
 	
 			if(setNodesEv.contains(this.ID)){
-				StartEventEtxBet se = new StartEventEtxBet();
+				/*StartEventEtxBet se = new StartEventEtxBet();
 				timeEvent += 1000;
 				System.out.println(this.ID+" emitiriar evento em: "+timeEvent);
-				se.startRelative(timeEvent, this);
-				
+				se.startRelative(timeEvent, this);*/
+				IniciaEvento ee = new IniciaEvento();
+				timeEvent += 1000;
+				System.out.println(this.ID+" emitiriar evento em: "+timeEvent);
+				ee.startRelative(timeEvent, this);
 				
 	//			for(int i = 10; i < 300; i+=10){
 	//				se = new StartEvent();
