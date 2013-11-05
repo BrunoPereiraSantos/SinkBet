@@ -1,5 +1,10 @@
-N=500 rcvSink=131 allMsg_HeR=999 allPkt=6955 AllpktEv=250 PktAggr=119 intervalAggr=10.0 ev=50 nNodesEv=250 NumberNodes=500 PktDrop=522 Energy=5.660.402,000 EnergyEvent=1.691.023,600
-N=500 rcvSink=116 allMsg_HeR=999 allPkt=7345 AllpktEv=250 PktAggr=134 intervalAggr=10.0 ev=50 nNodesEv=250 NumberNodes=500 PktDrop=459 Energy=5.718.518,000 EnergyEvent=1.676.304,000
-N=500 rcvSink=121 allMsg_HeR=999 allPkt=7321 AllpktEv=250 PktAggr=129 intervalAggr=10.0 ev=50 nNodesEv=250 NumberNodes=500 PktDrop=614 Energy=6.229.672,400 EnergyEvent=1.856.916,400
-N=500 rcvSink=111 allMsg_HeR=999 allPkt=7770 AllpktEv=250 PktAggr=139 intervalAggr=10.0 ev=50 nNodesEv=250 NumberNodes=500 PktDrop=610 Energy=6.581.138,000 EnergyEvent=1.737.978,000
-N=500 rcvSink=138 allMsg_HeR=999 allPkt=6713 AllpktEv=250 PktAggr=112 intervalAggr=10.0 ev=50 nNodesEv=250 NumberNodes=500 PktDrop=375 Energy=5.597.317,200 EnergyEvent=1.671.890,400
+N=200 rcvSink=73 allMsg_HeR=399 allPkt=1906 AllpktEv=100 PktAggr=27 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=134 Energy=966.296,400 EnergyEvent=62.740,800 id=0
+N=200 rcvSink=73 allMsg_HeR=399 allPkt=1914 AllpktEv=100 PktAggr=27 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=144 Energy=966.711,600 EnergyEvent=63.156,000 id=0
+N=200 rcvSink=79 allMsg_HeR=399 allPkt=1927 AllpktEv=100 PktAggr=21 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=124 Energy=969.198,800 EnergyEvent=65.643,200 id=0
+N=200 rcvSink=73 allMsg_HeR=399 allPkt=1973 AllpktEv=100 PktAggr=27 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=181 Energy=971.611,200 EnergyEvent=68.055,600 id=0
+N=200 rcvSink=77 allMsg_HeR=399 allPkt=1959 AllpktEv=100 PktAggr=23 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=182 Energy=969.959,600 EnergyEvent=66.404,000 id=0
+N=200 rcvSink=82 allMsg_HeR=399 allPkt=1939 AllpktEv=100 PktAggr=18 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=137 Energy=969.921,600 EnergyEvent=66.366,000 id=0
+N=200 rcvSink=73 allMsg_HeR=399 allPkt=1901 AllpktEv=100 PktAggr=27 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=139 Energy=965.474,400 EnergyEvent=61.918,800 id=0
+N=200 rcvSink=73 allMsg_HeR=399 allPkt=1930 AllpktEv=100 PktAggr=27 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=139 Energy=968.792,000 EnergyEvent=65.236,400 id=0
+N=200 rcvSink=74 allMsg_HeR=399 allPkt=1836 AllpktEv=100 PktAggr=26 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=98 Energy=960.088,400 EnergyEvent=56.532,800 id=0
+N=200 rcvSink=69 allMsg_HeR=399 allPkt=1937 AllpktEv=100 PktAggr=31 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=156 Energy=968.742,800 EnergyEvent=65.187,200 id=0

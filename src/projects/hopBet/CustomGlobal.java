@@ -52,7 +52,6 @@ import java.lang.Math;
 import javax.swing.JOptionPane;
 
 import projects.defaultProject.models.reliabilityModels.LossyDelivery;
-import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
 import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeRoleHopSbet;
@@ -92,22 +91,24 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	
 	
 	private Logging myLogHopSbet;
-	private int NumberNodes = 0, idTopology = 0;
+	private int NumberNodes = 0, idTopology = 0, rMax = 0;
 	
 	
 	public void preRun() {
-		// colocar true como segundo parametro (append) quando for rodar mais simulacoes
-		// usa o arquivo que está no config.xml
-		myLogHopSbet = Logging.getLogger("logHopSbet.txt", true);	// false caso for ler estes valores pelo CTDistribuido
 		
 		try {
 			NumberNodes = Configuration.getIntegerParameter("NumberNodes");
 			idTopology = Configuration.getIntegerParameter("idTopology");
+			rMax = Configuration.getIntegerParameter("UDG/rMax");
 			//System.out.println(NumberNodes);
 			//System.out.println(ev);
 		} catch (CorruptConfigurationEntryException e) {
 			Tools.fatalError("Alguma das variaveis (NumberNodes, idTopology) nao estao presentes no arquivo de configuracao ");
 		}
+		
+		// colocar true como segundo parametro (append) quando for rodar mais simulacoes
+		// usa o arquivo que está no config.xml
+		myLogHopSbet = Logging.getLogger("logHopSbet_"+NumberNodes+".txt", true);	// false caso for ler estes valores pelo CTDistribuido
 	}
 	
 	public void onExit() {
@@ -117,7 +118,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	    format.setMinimumFractionDigits(3);
 		String str = "";
 		
-		str += "N=" + numberOfNodes;
+		/*str += "N=" + numberOfNodes;
 		str += " rcvSink="+NodeHopSbet.getCount_rcv_ev_sink();
 		str += " allMsg_HeR="+NodeHopSbet.getCount_all_msg_sent();
 		str += " allPkt="+NodeHopSbet.getCount_all_broadcast();
@@ -131,6 +132,34 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		str += " PktDrop=" + NodeHopSbet.getCountDropPkt();
 		str += " Energy=" + format.format(NodeHopSbet.getEnergySpentTotal());
 		str += " EnergyEvent=" + format.format(NodeHopSbet.getEnergySpentByEvent());
+		str += " id=" + idTopology;*/
+		
+		Iterator<Node> it = Tools.getNodeList().iterator();
+		NodeHopSbet n;
+		int qntBroadcast = 0;
+		while(it.hasNext()){
+			n = (NodeHopSbet) it.next();
+			qntBroadcast += n.getBroadcastCount();
+		}
+		
+		
+		str += numberOfNodes;
+		str += " "+NodeHopSbet.getCount_rcv_ev_sink();
+		str += " "+NodeHopSbet.getCount_all_msg_sent();
+		str += " "+NodeHopSbet.getCount_all_broadcast();
+		str += " "+qntBroadcast;
+		str += " "+NodeHopSbet.getCount_all_overhead();
+		str += " " + NodeHopSbet.getCount_all_ev_sent();
+		//str += " PktAggr=" + NodeHopSbet.getCount_all_msg_aggr();
+		//str += " " + (NodeHopSbet.getCount_all_ev_sent() - NodeHopSbet.getCount_rcv_ev_sink());
+		str += " " + NodeHopSbet.getIntervalAggr();
+		str += " " + NodeHopSbet.getEv();
+		str += " " + NodeHopSbet.getnNodesEv();
+		str += " " + NodeHopSbet.getNumberNodes();
+		str += " " + NodeHopSbet.getCountDropPkt();
+		str += " " + format.format(NodeHopSbet.getEnergySpentTotal());
+		str += " " + format.format(NodeHopSbet.getEnergySpentByEvent());
+		str += " " + idTopology;
 		
 		myLogHopSbet.logln(str);
 		
@@ -205,17 +234,26 @@ public class CustomGlobal extends AbstractCustomGlobal{
 			try {  
 		        Process p = java.lang.Runtime.getRuntime().exec("pwd");
 		        BufferedReader stdInput = new BufferedReader(new  InputStreamReader(p.getInputStream()));
-		        String s;
+		        String s, s1;
 		        
 		        if((s = stdInput.readLine()) != null){
 		        	s += "/topology/";
 		    		s += idTopology;
 		    		s += "_"+Configuration.dimX+"X"+Configuration.dimY;
 		    		s += "_"+NumberNodes;
+		    		s += "_"+rMax;
+	    			s1 = s;
+		    		
 		    		s += "_conection.txt";
-		        	File arquivo = new File(s);
+		    		s1 += "_NodesEvents.txt";
+		    		File arquivo = new File(s);
+		        	File arquivo1 = new File(s1);
 		        	
 		        	if (!arquivo.exists()) {
+		        		System.out.println("Erro arquivo nao existe"); 
+	        		}
+		        	
+		        	if (!arquivo1.exists()) {
 		        		System.out.println("Erro arquivo nao existe"); 
 	        		}
 		        	
@@ -258,6 +296,29 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		        		
 		        	}
 		        	
+		        	
+		        	br.close();
+		        	fr.close();
+		        	
+		        	//faz a leitura do arquivo
+		        	fr = new FileReader(arquivo1);
+		        	 
+		        	br = new BufferedReader(fr);
+		        	
+		        	//equanto houver mais linhas
+		        	while (br.ready()) {
+		        		String linha = br.readLine();
+		        		String[] vet = linha.split(" ");
+		        		
+		        		int id = Integer.parseInt(vet[0]);
+		        		int time = Integer.parseInt(vet[1]);
+		        		//System.out.println(id);
+		        		//NodeHopSbet n = (NodeHopSbet) Tools.getNodeByID(id);
+		        		//n.setSendEvent(true);
+		        		NodeHopSbet.getSetNodesEv().add(new Integer(id));
+		        		NodeHopSbet n = (NodeHopSbet) Tools.getNodeByID(id);
+		        		n.setTimeEvent(time);
+		        	}
 		        	
 		        	br.close();
 		        	fr.close();
@@ -357,7 +418,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 				
 				if(n.ID == 2){
 					if(e.endNode.ID == 1)
-						e.setETX(9);
+						e.setETX(1);
 					if(e.endNode.ID == 3)
 						e.setETX(1);
 					if(e.endNode.ID == 4)

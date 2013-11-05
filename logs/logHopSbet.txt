@@ -1,3 +1,0 @@
-N=200 rcvSink=59 allMsg_HeR=399 allPkt=2560 AllpktEv=100 PktAggr=41 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=946 Energy=1.896.814,000 EnergyEvent=989.718,000
-N=200 rcvSink=60 allMsg_HeR=399 allPkt=2730 AllpktEv=100 PktAggr=40 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=1094 Energy=1.947.712,000 EnergyEvent=1.040.616,000
-N=200 rcvSink=64 allMsg_HeR=399 allPkt=2511 AllpktEv=100 PktAggr=36 intervalAggr=10.0 ev=50 nNodesEv=100 NumberNodes=200 PktDrop=886 Energy=1.881.908,400 EnergyEvent=974.812,400

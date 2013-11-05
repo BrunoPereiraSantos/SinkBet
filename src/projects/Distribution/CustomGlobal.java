@@ -42,11 +42,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
 import projects.Distribution.nodes.edges.EdgeETX;
+import projects.Distribution.nodes.nodeImplementations.SimpleNode;
+import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
+import projects.hopBet.nodes.nodeImplementations.NodeHopSbet;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.nodes.Node;
@@ -54,6 +61,7 @@ import sinalgo.nodes.Position;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.runtime.AbstractCustomGlobal;
 import sinalgo.runtime.Global;
+import sinalgo.runtime.Runtime;
 import sinalgo.tools.Tools;
 import sinalgo.tools.logging.Logging;
 
@@ -82,13 +90,22 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	
 	private Logging Topology;
 	private Logging conectionEtx;
-	private int NumberNodes = 0, idTopology = 0;
+	private Logging NodesEvents;
+	private int NumberNodes = 0, idTopology = 0, rMax = 0;
+	
+	private int ev = 0;	// % de nodes que vao emitir eventos
+	//variavel para gerar numeros aleatorios
+	private Random gerador = new Random();
+	//variavel para indicar quais nodos emitirao eventos
+	private static Set<Integer>  setNodesEv = new HashSet<Integer>();
 	
 	public void preRun() {
 		
 		try {
 			NumberNodes = Configuration.getIntegerParameter("NumberNodes");
 			idTopology = Configuration.getIntegerParameter("idTopology");
+			rMax = Configuration.getIntegerParameter("UDG/rMax");
+			ev = Configuration.getIntegerParameter("EV");
 			//System.out.println(NumberNodes);
 			//System.out.println(ev);
 		} catch (CorruptConfigurationEntryException e) {
@@ -99,31 +116,58 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		str += idTopology;
 		str += "_"+Configuration.dimX+"X"+Configuration.dimY;
 		str += "_"+NumberNodes;
+		str += "_"+rMax;
 		
 		Topology = Logging.getLogger(str+"_topology.txt", true);
 		
 		conectionEtx = Logging.getLogger(str+"_conection.txt", true);
 		
+		
+		NodesEvents = Logging.getLogger(str+"_NodesEvents.txt", true);
+		
+		int nNodesEv = (NumberNodes * ev) / 100;
+		if(nNodesEv <= 0) nNodesEv = 1;
+		//System.out.println(nNodesEv);
+		
+		while(setNodesEv.size() != nNodesEv){
+			setNodesEv.add(new Integer(gerador.nextInt(NumberNodes-1) + 2));
+		}
+		Iterator<Integer> it = setNodesEv.iterator();
+		while(it.hasNext()){
+			Integer idNode = (Integer) it.next();
+			NodesEvents.logln(idNode.toString()+" "+gerador.nextInt(1000));
+		}
+		
 	}
 	
 	
 	public void postRound(){
-		if(Global.currentTime == 3){
+		if(Global.currentTime == 5){
 			
 			try {  
-		        Process p = Runtime.getRuntime().exec("pwd");
+		        Process p = java.lang.Runtime.getRuntime().exec("pwd");
 		        BufferedReader stdInput = new BufferedReader(new  InputStreamReader(p.getInputStream()));
-		        String s;
+		        String s, s1;
 		        
 		        if((s = stdInput.readLine()) != null){
 		        	s += "/topology/";
 		    		s += idTopology;
 		    		s += "_"+Configuration.dimX+"X"+Configuration.dimY;
 		    		s += "_"+NumberNodes;
+		    		s += "_"+rMax;
+		    		s1 = s;
+		    		
 		    		s += "_conection.txt";
+		    		s1 += "_NodesEvents.txt";
+		    		
 		        	File arquivo = new File(s);
+		        	File arquivo1 = new File(s1);
 		        	
 		        	if (!arquivo.exists()) {
+		        		System.out.println("Erro arquivo nao existe"); 
+	        		}
+		        	
+		        	if (!arquivo1.exists()) {
 		        		System.out.println("Erro arquivo nao existe"); 
 	        		}
 		        	
@@ -169,6 +213,25 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		        	
 		        	br.close();
 		        	fr.close();
+		        	
+		        	//faz a leitura do arquivo
+		        	fr = new FileReader(arquivo1);
+		        	 
+		        	br = new BufferedReader(fr);
+		        	
+		        	//equanto houver mais linhas
+		        	while (br.ready()) {
+		        		String linha = br.readLine();
+		        		String[] vet = linha.split(" ");
+		        		
+		        		int id = Integer.parseInt(vet[0]);
+		        		int time = Integer.parseInt(vet[1]);
+		        		System.out.println(id+" "+time);
+		        	}
+		        	
+		        	br.close();
+		        	fr.close();
+		        	
 		        }
 		       
 		    } catch(Exception e) {  
@@ -183,7 +246,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	 */
 	public boolean hasTerminated() {
 
-		Iterator<Node> it = Tools.getNodeList().iterator();
+		/*Iterator<Node> it = Tools.getNodeList().iterator();
 		String str;
 		it = Tools.getNodeList().iterator();
 		while(it.hasNext()){
@@ -198,8 +261,8 @@ public class CustomGlobal extends AbstractCustomGlobal{
 				str += e.endNode.ID+"\n";
 			}	
 			//System.out.println(str);
-		}
-		return true;
+		}*/
+		return false;
 	}
 
 	public void onExit() {
@@ -259,4 +322,188 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	public void sampleButton() {
 		JOptionPane.showMessageDialog(null, "You Pressed the 'GO' button.");
 	}
+	
+	
+	/**
+	 * Dummy button to create a tree.  
+	 */
+	@AbstractCustomGlobal.CustomButton(buttonText="Graphics", toolTipText="Show Graphics")
+	public void Button3() {
+		//int numNodes = Integer.parseInt(Tools.showQueryDialog("Number of nodes:"));
+		//int fanOut = Integer.parseInt(Tools.showQueryDialog("Max fanout:"));
+		//buildTree(fanOut, numLeaves);
+		printGraphicsINGuI(); 
+	}
+	
+	public void printGraphicsINGuI(){
+		Vector<SimpleNode> myNodes = new Vector<SimpleNode>();
+		
+		SimpleNode n = new SimpleNode();
+		n.setPosition(300, 500, 0);
+		n.finishInitializationWithDefaultModels(true);
+		myNodes.add(n);
+		
+		n = new SimpleNode();
+		n.setPosition(350, 500, 0);
+		n.finishInitializationWithDefaultModels(true);
+		myNodes.add(n);
+		
+		
+		n = new SimpleNode();
+		n.setPosition(400, 450, 0);
+		n.finishInitializationWithDefaultModels(true);
+		myNodes.add(n);
+		
+		n = new SimpleNode();
+		n.setPosition(400, 550, 0);
+		n.finishInitializationWithDefaultModels(true);
+		myNodes.add(n);
+		
+		n = new SimpleNode();
+		n.setPosition(450, 500, 0);
+		n.finishInitializationWithDefaultModels(true);
+		myNodes.add(n);
+		
+		n = new SimpleNode();
+		n.setPosition(450, 400, 0);
+		n.finishInitializationWithDefaultModels(true);
+		myNodes.add(n);
+		
+		n = new SimpleNode();
+		n.setPosition(500, 450, 0);
+		n.finishInitializationWithDefaultModels(true);
+		myNodes.add(n);
+		
+		
+		n = new SimpleNode();
+		n.setPosition(500, 500, 0);
+		n.finishInitializationWithDefaultModels(true);
+		myNodes.add(n);
+		
+		n = new SimpleNode();
+		n.setPosition(550, 550, 0);
+		n.finishInitializationWithDefaultModels(true);
+		myNodes.add(n);
+		// Repaint the GUI as we have added some nodes
+		Tools.repaintGUI();
+		
+	}
+	
+	
+	/**
+	 * Dummy button to create a tree.  
+	 */
+	@AbstractCustomGlobal.CustomButton(buttonText="ETX", toolTipText="Insert ETX")
+	public void Button() {
+		//int numNodes = Integer.parseInt(Tools.showQueryDialog("Number of nodes:"));
+		//int fanOut = Integer.parseInt(Tools.showQueryDialog("Max fanout:"));
+		//buildTree(fanOut, numLeaves);
+		insertETX(); 
+	}
+	
+	public void insertETX(){
+		Iterator<Node> it = Runtime.nodes.iterator();
+		SimpleNode n;
+		/*Iterator<Node> it = Runtime.nodes.iterator();
+		Node n;
+		Random generator = new Random(1);
+		while(it.hasNext()){
+			n = it.next();
+			System.out.println(n);
+			Iterator<Edge> it2 = n.outgoingConnections.iterator();
+			EdgeWeightHopSbet e;
+			while(it2.hasNext()){
+				e = (EdgeWeightHopSbet) it2.next();
+				//e.setETX(UniformDistribution.nextUniform(0, 1));
+				//e.setETX(generator.nextDouble());
+				e.setETX(1+generator.nextInt(9));
+
+			}
+		}*/
+		
+		while(it.hasNext()){
+			n = (SimpleNode) it.next();
+			//System.out.println(n);
+			Iterator<Edge> it2 = n.outgoingConnections.iterator();
+			EdgeETX e;
+			while(it2.hasNext()){
+				e = (EdgeETX) it2.next();
+				if(n.ID == 1){
+					if(e.endNode.ID == 2)
+						e.setETX(2);
+				}
+				
+				if(n.ID == 2){
+					if(e.endNode.ID == 1)
+						e.setETX(1);
+					if(e.endNode.ID == 3)
+						e.setETX(1);
+					if(e.endNode.ID == 4)
+						e.setETX(1);
+				}
+
+				if(n.ID == 3){
+					if(e.endNode.ID == 2)
+						e.setETX(2);
+					if(e.endNode.ID == 5)
+						e.setETX(1);
+					if(e.endNode.ID == 6)
+						e.setETX(1);
+				}
+
+				if(n.ID == 4){
+					if(e.endNode.ID == 2)
+						e.setETX(2);
+					if(e.endNode.ID == 5)
+						e.setETX(1);
+				}
+
+				if(n.ID == 5){
+					if(e.endNode.ID == 3)
+						e.setETX(2);
+					if(e.endNode.ID == 4)
+						e.setETX(2);
+					if(e.endNode.ID == 7)
+						e.setETX(1);
+					if(e.endNode.ID == 8)
+						e.setETX(1);
+				}
+
+				if(n.ID == 6){
+					if(e.endNode.ID == 3)
+						e.setETX(9);
+					if(e.endNode.ID == 7)
+						e.setETX(1);
+				}
+
+				if(n.ID == 7){
+					if(e.endNode.ID == 5)
+						e.setETX(2);
+					if(e.endNode.ID == 6)
+						e.setETX(1);
+					if(e.endNode.ID == 8)
+						e.setETX(2);
+				}
+
+				if(n.ID == 8){
+					if(e.endNode.ID == 5)
+						e.setETX(4);
+					if(e.endNode.ID == 7)
+						e.setETX(2);
+					if(e.endNode.ID == 9)
+						e.setETX(2);
+				}
+
+				if(n.ID == 9){
+					if(e.endNode.ID == 8)
+						e.setETX(1);
+				}
+				
+				//e.setETX(1+generator.nextInt(9));
+				System.out.println("ID "+ e.getID()+"      " +n.ID+" ~["+e.getETX()+"]> "+e.endNode.ID);
+
+			}
+		}
+	}
+	
 }

@@ -14,7 +14,7 @@ import sinalgo.tools.Tools;
 public class ReadTopology extends DistributionModel {
 
 	public static int index = 1;
-	public int idTopology, dimX, dimY, NumberNodes;
+	public int idTopology, dimX, dimY, NumberNodes, rMax;
 	
 	@Override
 	public Position getNextPosition() {
@@ -23,6 +23,7 @@ public class ReadTopology extends DistributionModel {
 			try {
 				NumberNodes = Configuration.getIntegerParameter("NumberNodes");
 				idTopology = Configuration.getIntegerParameter("idTopology");
+				rMax = Configuration.getIntegerParameter("UDG/rMax");
 				//System.out.println(NumberNodes);
 				//System.out.println(ev);
 			} catch (CorruptConfigurationEntryException e) {
@@ -39,6 +40,7 @@ public class ReadTopology extends DistributionModel {
 	    		s += idTopology;
 	    		s += "_"+Configuration.dimX+"X"+Configuration.dimY;
 	    		s += "_"+NumberNodes;
+	    		s += "_"+rMax;
 	    		s += "_topology.txt";
 	        	File arquivo = new File(s);
 	        	

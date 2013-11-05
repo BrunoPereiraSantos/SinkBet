@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
 import projects.etxBet.nodes.messages.PackAckEtxBet;
 import projects.etxBet.nodes.timers.ReFwdEventExtBet;
+import projects.etxBet.nodes.timers.StartEventEtxBet;
 import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
 import projects.hopBet.nodes.messages.PackAckHopSbet;
 import projects.hopBet.nodes.messages.PackEventHopSbet;
@@ -35,6 +36,7 @@ import sinalgo.nodes.Node;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
+import sinalgo.runtime.Global;
 import sinalgo.tools.Tools;
 
 public class NodeHopSbet extends Node {
@@ -76,6 +78,9 @@ public class NodeHopSbet extends Node {
 	
 	//Flag para indicar se o nodo esta em periodo de agregacao
 	private boolean inAggregation;
+
+	//Flag para informar se o nodo emitira evento
+	private boolean sendEvent;
 	
 	//Intervalo para aceitar pacotes para agregacao
 	private static double intervalAggr;
@@ -89,6 +94,9 @@ public class NodeHopSbet extends Node {
 	//variavel para indicar quais nodos emitirao eventos
 	private static Set<Integer>  setNodesEv = new HashSet<Integer>();
 	
+	//variavel para indicar qual o tempo de inicio do primerio evento deste no
+	private int timeEvent;
+	
 	//variavel para gerar numeros aleatorios
 	private Random gerador = new Random();
 	
@@ -96,10 +104,12 @@ public class NodeHopSbet extends Node {
 	
 	//ESTATISTICAS
 	private int countMsgAggr = 0;		// numero de mensagens que foram agregadas em cada nodo
+	private int broadcastCount = 0;		// numero de mensagens broadcast por no
 	private static int count_all_msg_aggr = 0;		// numero de mensagens que foram agregadas
 	private static int count_rcv_ev_sink = 0;	//quantidade de mensagens eventos recebidas pelo sink
 	private static int count_all_msg_sent = 0; //numero de mensagens enviadas
 	private static int count_all_broadcast = 0; //numero de broadcasts
+	private static int count_all_overhead = 0; //numero de broadcasts overhead
 	private static int count_all_ev_sent = 0;  //numero de eventos
 	private static int NumberNodes = 0; // numero total de nos
 	private static int ev = 0;			// % de nodes que vao emitir eventos
@@ -143,6 +153,8 @@ public class NodeHopSbet extends Node {
 			}else if(msg instanceof PackAckHopSbet) {
 				PackAckHopSbet d = (PackAckHopSbet) msg;
 				handlePackAck(d);
+				energySpentTotal += cr;
+				energySpentByEvent += cr;
 			}
 			// o custo foi colocado em cada if
 			// pois o tratamento de perda de pacotes foi colocado
@@ -184,6 +196,8 @@ public class NodeHopSbet extends Node {
 			this.setColor(Color.MAGENTA);
 			setPathsToSink(getPathsToSink() + message.getPath());
 			message.setHops(getHops());
+			
+			fhp.updateTimer(2.0);
 		}
 
 		// eh a primeira vez que o nodo recebe um hello
@@ -219,7 +233,7 @@ public class NodeHopSbet extends Node {
 		//ESTATISTICA
 		setCount_all_broadcast(getCount_all_broadcast() + 1);
 		setCount_all_msg_sent(getCount_all_msg_sent() + 1);
-		
+		setCount_all_overhead(getCount_all_overhead() + 1);
 		energySpentTotal += cf + y * Math.pow(range, alfa);
 	}
 	
@@ -231,7 +245,7 @@ public class NodeHopSbet extends Node {
 		//ESTATISTICA
 		setCount_all_broadcast(getCount_all_broadcast() + 1);
 		setCount_all_msg_sent(getCount_all_msg_sent() + 1);
-		
+		setCount_all_overhead(getCount_all_overhead() + 1);
 		energySpentTotal += cf + y * Math.pow(range, alfa);
 	}
 
@@ -249,7 +263,7 @@ public class NodeHopSbet extends Node {
 			//ESTATISTICA
 			setCount_all_broadcast(getCount_all_broadcast() + 1);
 			setCount_all_msg_sent(getCount_all_msg_sent() + 1);
-			
+			setCount_all_overhead(getCount_all_overhead() + 1);
 			energySpentTotal += cf + y * Math.pow(range, alfa);
 		}
 	}
@@ -270,7 +284,7 @@ public class NodeHopSbet extends Node {
 	public void handlePackReply(PackReplyHopSbet message) {
 		
 		// o sink nao deve manipular pacotes do tipo Relay
-		if((message.getSendTo() == message.getSinkID()) && (this.ID == message.getSinkID())){
+		if(this.ID == message.getSinkID()){
 			return;
 		}
 		
@@ -295,13 +309,12 @@ public class NodeHopSbet extends Node {
 			message.setSendTo(getNextHop());
 			
 			FwdPackReplyHopSbet fwdReply = new FwdPackReplyHopSbet(message);
-			fwdReply.startRelative(0.1, this);
+			fwdReply.startRelative(1, this);
 					
 		}
 		
 		// Uma mensagem foi recebida pelos ancestrais logo devo analisar se e o meu nextHop
 		if (message.getHops() < getHops()){	
-			
 			if (message.getsBet() > getNeighborMaxSBet()) {
 				//System.out.println(message);
 				//System.out.println(this.ID+" Entrei e mudei meu nhop");
@@ -338,7 +351,7 @@ public class NodeHopSbet extends Node {
 		
 		//ESTATISTICA
 		setCount_all_broadcast(getCount_all_broadcast() + 1);
-		
+		setCount_all_overhead(getCount_all_overhead() + 1);
 		energySpentTotal += cf + y * Math.pow(range, alfa);
 	}
 	
@@ -352,7 +365,7 @@ public class NodeHopSbet extends Node {
 		
 		if(message.getnHop() == this.ID){
 			double p = gerador.nextInt(100) + 1;
-			System.out.println("No "+this.ID+" gerou um probabilidade p = "+p);
+			System.out.println("No "+this.ID+" gerou um probabilidade p = "+p+" No tempo: "+Global.currentTime);
 			//a escala esta entre 0 a 10, ou seja, o valor do etx na aresta idica
 			// que o noh tem ETX chanses de errar o pacote
 			// se etx = 1 entao de cada 10 pacotes eu perco 1
@@ -385,6 +398,15 @@ public class NodeHopSbet extends Node {
 			return;
 		}
 		
+		if(message.getnHop() == this.ID){
+			message.setnHop(nextHop); // modifica quem e o proximo hop
+			message.setPreviousHop(this.ID); //modifica qm foi o ultimo a enviar
+			
+			LoadAggregation la = new LoadAggregation(message);
+			//setCountMsgAggr(getCountMsgAggr() + 1);
+			la.startRelative(1, this);
+		}
+		
 		//sem agregacao
 		/*if((!isInAggregation()) && (message.getnHop() == this.ID)){
 			setInAggregation(true);
@@ -398,7 +420,7 @@ public class NodeHopSbet extends Node {
 		}*/
 		
 		//com agregacao
-		if((!isInAggregation()) && (message.getnHop() == this.ID)){
+		/*if((!isInAggregation()) && (message.getnHop() == this.ID)){
 			System.out.println(this.ID+" agregando...");
 			setInAggregation(true);
 			
@@ -406,7 +428,7 @@ public class NodeHopSbet extends Node {
 			message.setPreviousHop(this.ID); //modifica qm foi o ultimo a enviar
 			
 			LoadAggregation la = new LoadAggregation(message);
-			setCountMsgAggr(getCountMsgAggr() + 1);
+			//setCountMsgAggr(getCountMsgAggr() + 1);
 			la.startRelative(getIntervalAggr(), this); //getIntervalAggr() e o tempo para esperar por mensagens a ser agregadas
 			
 		}else if(message.getnHop() == this.ID){
@@ -415,9 +437,8 @@ public class NodeHopSbet extends Node {
 			setCount_all_msg_aggr(getCount_all_msg_aggr() + 1);
 			System.out.println(this.ID+" agregou "+getCountMsgAggr());
 			
-			
 			message = null;	// todas as mensgagens agregadas sao "descartadas"
-		}
+		}*/
 	}
 	
 	public void fwdEvent(PackEventHopSbet message){
@@ -438,6 +459,7 @@ public class NodeHopSbet extends Node {
 		rfe.startRelative(4, this);
 		
 		//ESTATISTICA
+		broadcastCount++;
 		setCount_all_broadcast(getCount_all_broadcast() + 1);
 		
 		energySpentTotal += cf + y * Math.pow(range, alfa);
@@ -454,6 +476,7 @@ public class NodeHopSbet extends Node {
 			rfe.startRelative(4, this);
 			
 			//ESTATISTICA
+			broadcastCount++;
 			setCount_all_broadcast(getCount_all_broadcast() + 1);
 			
 			energySpentTotal += cf + y * Math.pow(range, alfa);
@@ -474,6 +497,7 @@ public class NodeHopSbet extends Node {
 		re.startRelative(4, this);
 		
 		//ESTATISTICA
+		broadcastCount++;
 		setCount_all_broadcast(getCount_all_broadcast() + 1);
 		
 		energySpentTotal += cf + y * Math.pow(range, alfa);
@@ -497,13 +521,14 @@ public class NodeHopSbet extends Node {
 	
 	public void sendAck(int destination){
 		broadcast(new PackAckHopSbet(destination));
-		/*
+		
 		//ESTATISTICA
+		broadcastCount++;
 		setCount_all_broadcast(getCount_all_broadcast() + 1);
 		
 		energySpentTotal += cf + y * Math.pow(range, alfa);
 		
-		energySpentByEvent += cf + y * Math.pow(range, alfa);*/
+		energySpentByEvent += cf + y * Math.pow(range, alfa);
 	}
 	
 	/*=============================================================
@@ -523,7 +548,29 @@ public class NodeHopSbet extends Node {
 	
 	@Override
 	public void preStep() {
-		
+		if(Global.currentTime == 2){
+			/*if(isSendEvent()){
+				StartEventEtxBet se = new StartEventEtxBet();
+				int time = gerador.nextInt(1000) + 1000;
+				System.out.println(this.ID+" emitiriar evento em: "+time);
+				se.startRelative(time, this);
+			}*/
+	
+			if(setNodesEv.contains(this.ID)){
+				StartEventHopSbet se = new StartEventHopSbet();
+				timeEvent += 1000;
+				System.out.println(this.ID+" emitiriar evento em: "+timeEvent);
+				se.startRelative(timeEvent, this);
+				
+				
+	//			for(int i = 10; i < 300; i+=10){
+	//				se = new StartEvent();
+	//				//System.out.println(this.ID+" emitiriar evento em: "+(time+i)+"  "+i/10);
+	//				se.startRelative(time+i, this);
+	//				
+	//			}
+			}
+		}
 	}
 
 	@Override
@@ -539,6 +586,7 @@ public class NodeHopSbet extends Node {
 		setInAggregation(false);
 		setCountMsgAggr(0);
 		setCount_rcv_ev_sink(0);
+		setSendEvent(false);
 		
 		setSonsPathMap(new HashMap<Integer, Integer>());
 		setSons(new ArrayList<Integer>());
@@ -559,20 +607,7 @@ public class NodeHopSbet extends Node {
 			readConfigurationParameters();
 		}
 		
-		if(setNodesEv.contains(this.ID)){
-			StartEventHopSbet se = new StartEventHopSbet();
-			int time = gerador.nextInt(1000) + 2020;
-			System.out.println(this.ID+" emitiriar evento em: "+time);
-			se.startRelative(time, this);
-			
-			
-//			for(int i = 10; i < 300; i+=10){
-//				se = new StartEvent();
-//				//System.out.println(this.ID+" emitiriar evento em: "+(time+i)+"  "+i/10);
-//				se.startRelative(time+i, this);
-//				
-//			}
-		}
+
 		
 	}
 	
@@ -587,18 +622,18 @@ public class NodeHopSbet extends Node {
 			ev = Configuration.getIntegerParameter("EV");
 			intervalAggr = Configuration.getDoubleParameter("intervalAggr");
 			//System.out.println(NumberNodes);
-			//System.out.println(ev);
+			//System.out.prreadintln(ev);
 		} catch (CorruptConfigurationEntryException e) {
 			Tools.fatalError("Alguma das variaveis (NumberNodes, EV, interval) nao estao presentes no arquivo de configuracao ");
 		}
 		
-		nNodesEv = (NumberNodes * ev) / 100;
+		/*nNodesEv = (NumberNodes * ev) / 100;
 		if(nNodesEv <= 0) nNodesEv = 1;
 		//System.out.println(nNodesEv);
 		
 		while(setNodesEv.size() != nNodesEv){
 			setNodesEv.add(new Integer(gerador.nextInt(NumberNodes-1) + 2));
-		}
+		}*/
 		//System.out.println(setNodesEv);
 		
 	}
@@ -901,6 +936,46 @@ public class NodeHopSbet extends Node {
 
 	public static void setEnergySpentTotal(double energySpentTotal) {
 		NodeHopSbet.energySpentTotal = energySpentTotal;
+	}
+
+
+	public static int getCount_all_overhead() {
+		return count_all_overhead;
+	}
+
+
+	public static void setCount_all_overhead(int count_all_overhead) {
+		NodeHopSbet.count_all_overhead = count_all_overhead;
+	}
+
+
+	public boolean isSendEvent() {
+		return sendEvent;
+	}
+
+
+	public void setSendEvent(boolean sendEvent) {
+		this.sendEvent = sendEvent;
+	}
+
+
+	public int getTimeEvent() {
+		return timeEvent;
+	}
+
+
+	public void setTimeEvent(int timeEvent) {
+		this.timeEvent = timeEvent;
+	}
+
+
+	public int getBroadcastCount() {
+		return broadcastCount;
+	}
+
+
+	public void setBroadcastCount(int broadcastCount) {
+		this.broadcastCount = broadcastCount;
 	}
 	
 	
