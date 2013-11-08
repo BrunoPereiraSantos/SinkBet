@@ -1,5 +1,7 @@
 package projects.hopBet.nodes.messages;
 
+import java.util.ArrayList;
+
 import sinalgo.nodes.messages.Message;
 
 public class PackReplyHopSbet extends Message {
@@ -9,22 +11,24 @@ public class PackReplyHopSbet extends Message {
 	private int senderID; // ID do nodo que enviou o pacote
 	private int sinkID; // ID do sink
 	private int sendTo; // next hop no nodo que enviou o pacote
+	private ArrayList<Integer> sendToNodes; // nodos que devem receber
 	private double sBet; //metrica sBet do nodo que enviou o pacote
 	
 	public PackReplyHopSbet(){}
 		
-	public PackReplyHopSbet(int hops, int path, int senderID, int sinkID, int sendTo, double sBet) {
+	public PackReplyHopSbet(int hops, int path, int senderID, int sinkID, int sendTo, ArrayList<Integer> sendToNodes , double sBet) {
 		this.hops = hops;
 		this.path = path;
 		this.senderID = senderID;
 		this.sinkID = sinkID;
 		this.sendTo = sendTo;
+		this.sendToNodes = sendToNodes;
 		this.sBet = sBet;
 	}
 
 	@Override
 	public Message clone() {
-		return new PackReplyHopSbet(this.hops, this.path, this.senderID, this.sinkID, this.sendTo, this.sBet);
+		return new PackReplyHopSbet(this.hops, this.path, this.senderID, this.sinkID, this.sendTo, this.sendToNodes, this.sBet);
 	}
 	
 	public String toString(){
@@ -48,6 +52,14 @@ public class PackReplyHopSbet extends Message {
 	public void setSendTo(int sendTo) {this.sendTo = sendTo;}
 	public double getsBet() {return sBet;}
 	public void setsBet(double sBet) {this.sBet = sBet;}
+	
+	public ArrayList<Integer> getSendToNodes() {
+		return sendToNodes;
+	}
+
+	public void setSendToNodes(ArrayList<Integer> sendToNodes) {
+		this.sendToNodes = sendToNodes;
+	}
 
 	protected void finalize() {}
 }

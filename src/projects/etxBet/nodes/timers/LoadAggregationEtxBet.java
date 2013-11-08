@@ -21,7 +21,7 @@ public class LoadAggregationEtxBet extends Timer {
 	@Override
 	public void fire() {
 		// TODO Auto-generated method stub
-		((NodeEtxBet)this.node).fwdEvent(pkt);
+		//((NodeEtxBet)this.node).fwdEvent(pkt);
 	}
 
 }

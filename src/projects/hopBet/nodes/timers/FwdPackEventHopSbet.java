@@ -4,7 +4,7 @@ import projects.hopBet.nodes.messages.PackEventHopSbet;
 import projects.hopBet.nodes.nodeImplementations.NodeHopSbet;
 import sinalgo.nodes.timers.Timer;
 
-public class EncaminhaEventoHopSbet extends Timer {
+public class FwdPackEventHopSbet extends Timer {
 
 	PackEventHopSbet pkt;
 	
@@ -14,7 +14,7 @@ public class EncaminhaEventoHopSbet extends Timer {
 	/**
 	 * @param pkt
 	 */
-	public EncaminhaEventoHopSbet(PackEventHopSbet pkt) {
+	public FwdPackEventHopSbet(PackEventHopSbet pkt) {
 		super();
 		this.pkt = pkt;
 	}

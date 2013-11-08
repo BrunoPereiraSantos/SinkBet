@@ -57,7 +57,6 @@ import projects.defaultProject.models.reliabilityModels.LossyDelivery;
 import projects.etxBet.nodes.edges.EdgeWeightEtxBet;
 import projects.etxBet.nodes.nodeImplementations.NodeEtxBet;
 import projects.etxBet.nodes.nodeImplementations.NodeRoleEtxBet;
-import projects.hopBet.nodes.nodeImplementations.NodeHopSbet;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.nodes.Node;
@@ -141,30 +140,30 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		
 		Iterator<Node> it = Tools.getNodeList().iterator();
 		NodeEtxBet n;
-		int qntBroadcast = 0;
+		int qntBroadcastEv = 0;
 		while(it.hasNext()){
 			n = (NodeEtxBet) it.next();
-			qntBroadcast += n.getBroadcastCount();
+			qntBroadcastEv += n.getCount_all_broadcast_event();
 		}
 		
-		str += numberOfNodes;
+		
+		str += idTopology;
+		str += " "+numberOfNodes;
+		//str += " " + NodeEtxBet.getNumberNodes();
 		str += " "+NodeEtxBet.getCount_rcv_ev_sink();
 		str += " "+NodeEtxBet.getCount_all_msg_sent();
 		str += " "+NodeEtxBet.getCount_all_broadcast();
-		str += " "+qntBroadcast;
 		str += " "+NodeEtxBet.getCount_all_overhead();
+		str += " "+qntBroadcastEv;
 		str += " " + NodeEtxBet.getCount_all_ev_sent();
 		//str += " PktAggr=" + NodeEtxBet.getCount_all_msg_aggr();
 		//str += " " + (NodeEtxBet.getCount_all_ev_sent() - NodeEtxBet.getCount_rcv_ev_sink());
 		str += " " + NodeEtxBet.getIntervalAggr();
 		str += " " + NodeEtxBet.getEv();
-		str += " " + NodeEtxBet.getnNodesEv();
-		str += " " + NodeEtxBet.getNumberNodes();
+		//str += " " + NodeEtxBet.getnNodesEv();
 		str += " " + NodeEtxBet.getCountDropPkt();
 		str += " " + format.format(NodeEtxBet.getEnergySpentTotal());
 		str += " " + format.format(NodeEtxBet.getEnergySpentByEvent());
-		str += " " + idTopology;
-		
 		
 		myLogEtxBet.logln(str);
 		

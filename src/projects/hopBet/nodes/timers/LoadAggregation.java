@@ -20,7 +20,7 @@ public class LoadAggregation extends Timer {
 	@Override
 	public void fire() {
 		// TODO Auto-generated method stub
-		((NodeHopSbet)this.node).fwdEvent(pkt);
+		//((NodeHopSbet)this.node).fwdEvent(pkt);
 	}
 
 }

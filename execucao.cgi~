@@ -2,20 +2,21 @@
 
 $numRounds = 3500; # number of rounds to perform per simulation
 $numNodes=200; # number of nodes
-$numExec=3;
+$numExec=5;
 $EV=50;
 $intervalAggr=10;
 $dimX=200;
 $dimY=200;
 $rMax=30;
 
-for(;$numNodes<=200; $numNodes+=300){
-  for($id=0; $id<1; $id+=1){
+for(;$numNodes<=800; $numNodes+=300){
+  for($id=1; $id<10; $id+=1){
     for($i=0 ; $i<$numExec; $i+=1) {
       system("./sinalgo " .
       "-batch ".
       "-project etxBet " .             # choose the project
-      "-gen $numNodes etxBet:NodeEtxBet hopBet:ReadTopology " . # generate nodes
+      "-gen $numNodes etxBet:NodeEtxBet etxBet:ReadTopology " . # generate nodes
+      #"-gen $numNodes etxBet:NodeEtxBet Random " . # generate nodes
       "-rounds $numRounds ".
       "UDG ".
       "-overwrite ".

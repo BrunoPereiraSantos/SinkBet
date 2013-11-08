@@ -136,30 +136,31 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		
 		Iterator<Node> it = Tools.getNodeList().iterator();
 		NodeHopSbet n;
-		int qntBroadcast = 0;
+		int qntBroadcastEv = 0;
 		while(it.hasNext()){
 			n = (NodeHopSbet) it.next();
-			qntBroadcast += n.getBroadcastCount();
+			qntBroadcastEv += n.getCount_all_broadcast_event();
 		}
 		
 		
-		str += numberOfNodes;
+		str += idTopology;
+		str += " "+numberOfNodes;
+		//str += " " + NodeHopSbet.getNumberNodes();
 		str += " "+NodeHopSbet.getCount_rcv_ev_sink();
 		str += " "+NodeHopSbet.getCount_all_msg_sent();
 		str += " "+NodeHopSbet.getCount_all_broadcast();
-		str += " "+qntBroadcast;
 		str += " "+NodeHopSbet.getCount_all_overhead();
+		str += " "+qntBroadcastEv;
 		str += " " + NodeHopSbet.getCount_all_ev_sent();
 		//str += " PktAggr=" + NodeHopSbet.getCount_all_msg_aggr();
 		//str += " " + (NodeHopSbet.getCount_all_ev_sent() - NodeHopSbet.getCount_rcv_ev_sink());
 		str += " " + NodeHopSbet.getIntervalAggr();
 		str += " " + NodeHopSbet.getEv();
-		str += " " + NodeHopSbet.getnNodesEv();
-		str += " " + NodeHopSbet.getNumberNodes();
+		//str += " " + NodeHopSbet.getnNodesEv();
 		str += " " + NodeHopSbet.getCountDropPkt();
 		str += " " + format.format(NodeHopSbet.getEnergySpentTotal());
 		str += " " + format.format(NodeHopSbet.getEnergySpentByEvent());
-		str += " " + idTopology;
+		
 		
 		myLogHopSbet.logln(str);
 		

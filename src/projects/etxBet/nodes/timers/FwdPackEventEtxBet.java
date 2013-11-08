@@ -4,7 +4,7 @@ import projects.etxBet.nodes.messages.PackEventEtxBet;
 import projects.etxBet.nodes.nodeImplementations.NodeEtxBet;
 import sinalgo.nodes.timers.Timer;
 
-public class EncaminhaEvento extends Timer {
+public class FwdPackEventEtxBet extends Timer {
 	PackEventEtxBet pkt;
 	
 	
@@ -12,7 +12,7 @@ public class EncaminhaEvento extends Timer {
 	/**
 	 * @param pkt
 	 */
-	public EncaminhaEvento(PackEventEtxBet pkt) {
+	public FwdPackEventEtxBet(PackEventEtxBet pkt) {
 		super();
 		this.pkt = pkt;
 	}

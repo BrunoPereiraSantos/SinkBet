@@ -20,7 +20,7 @@ public class ReFwdEventHopSbet extends Timer {
 	@Override
 	public void fire() {
 		// TODO Auto-generated method stub
-		((NodeHopSbet)this.node).reFwdEvent(this.pkt);
+		//((NodeHopSbet)this.node).reFwdEvent(this.pkt);
 	}
 	
 	

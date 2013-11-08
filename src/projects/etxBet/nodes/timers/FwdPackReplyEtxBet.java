@@ -1,5 +1,7 @@
 package projects.etxBet.nodes.timers;
 
+import java.util.ArrayList;
+
 import projects.etxBet.nodes.messages.PackReplyEtxBet;
 import projects.etxBet.nodes.nodeImplementations.NodeEtxBet;
 import sinalgo.nodes.timers.Timer;
@@ -18,14 +20,15 @@ public class FwdPackReplyEtxBet extends Timer {
 		pkt.setSenderID(msg.getSenderID());
 		pkt.setSinkID(msg.getSinkID());
 		pkt.setSendTo(msg.getSendTo());
+		pkt.setSendToNodes(msg.getSendToNodes());
 		pkt.setsBet(msg.getsBet());
 		pkt.setFwdID(msg.getFwdID());
 	}
 	
-	public FwdPackReplyEtxBet(int hops, int path, int senderID, int sinkID, int sendTo, double etx, double sBet, int fwdID) {
+	public FwdPackReplyEtxBet(int hops, int path, int senderID, int sinkID, int sendTo, ArrayList<Integer> sendToNodes, double etx, double sBet, int fwdID) {
 		//super();
 		//this.pkt = pkt;
-		pkt = new PackReplyEtxBet(hops, path, senderID, sinkID, sendTo, etx, sBet, fwdID);
+		pkt = new PackReplyEtxBet(hops, path, senderID, sinkID, sendTo, sendToNodes, etx, sBet, fwdID);
 	}
 	@Override
 	public void fire() {

@@ -8,7 +8,7 @@ public class ResendEventEtxBet extends Timer {
 	@Override
 	public void fire() {
 		// TODO Auto-generated method stub
-		((NodeEtxBet)this.node).resendEvent();
+		//((NodeEtxBet)this.node).resendEvent();
 	}
 
 }

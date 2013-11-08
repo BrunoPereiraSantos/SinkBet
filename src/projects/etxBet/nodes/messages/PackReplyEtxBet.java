@@ -1,5 +1,7 @@
 package projects.etxBet.nodes.messages;
 
+import java.util.ArrayList;
+
 import sinalgo.nodes.messages.Message;
 
 public class PackReplyEtxBet extends Message {
@@ -55,18 +57,20 @@ public class PackReplyEtxBet extends Message {
 	private int senderID; // ID do nodo que enviou o pacote
 	private int sinkID; // ID do sink
 	private int sendTo; // next hop no nodo que enviou o pacote
+	private ArrayList<Integer> sendToNodes; // nodos que devem receber
 	private double ETX; //ETX do nodo que enviou o pacote
 	private double sBet; //metrica sBet do nodo que enviou o pacote
 	private int fwdID; //ID do no que encaminhou a mensagem por ultimo
 	
 	public PackReplyEtxBet(){}
 		
-	public PackReplyEtxBet(int hops, int path, int senderID, int sinkID, int sendTo, double ETX, double sBet, int fwdID) {
+	public PackReplyEtxBet(int hops, int path, int senderID, int sinkID, int sendTo, ArrayList<Integer> sendToNodes, double ETX, double sBet, int fwdID) {
 		this.hops = hops;
 		this.path = path;
 		this.senderID = senderID;
 		this.sinkID = sinkID;
 		this.sendTo = sendTo;
+		this.sendToNodes = sendToNodes;
 		this.ETX = ETX;
 		this.sBet = sBet;
 		this.fwdID = fwdID;
@@ -74,7 +78,7 @@ public class PackReplyEtxBet extends Message {
 
 	@Override
 	public Message clone() {
-		return new PackReplyEtxBet(this.hops, this.path, this.senderID, this.sinkID, this.sendTo, this.ETX, this.sBet, this.fwdID);
+		return new PackReplyEtxBet(this.hops, this.path, this.senderID, this.sinkID, this.sendTo, this.sendToNodes, this.ETX, this.sBet, this.fwdID);
 	}
 	
 	public String toString(){
@@ -83,6 +87,7 @@ public class PackReplyEtxBet extends Message {
 		str = str.concat("SinkID = "+sinkID+"\n");
 		str = str.concat("hops ="+ hops);
 		str = str.concat("sendTo ="+ sendTo);
+		str = str.concat("sendToNodes ="+ sendToNodes);
 		str = str.concat("etx ="+ ETX);
 		str = str.concat("sBet ="+ sBet);
 		str = str.concat("fwdID ="+ fwdID);
@@ -99,6 +104,14 @@ public class PackReplyEtxBet extends Message {
 	public int getSinkID() {return sinkID;}
 	public void setSinkID(int sinkID) {this.sinkID = sinkID;}
 	
+	public ArrayList<Integer> getSendToNodes() {
+		return sendToNodes;
+	}
+
+	public void setSendToNodes(ArrayList<Integer> sendToNodes) {
+		this.sendToNodes = sendToNodes;
+	}
+
 	public double getETX() {
 		return ETX;
 	}
