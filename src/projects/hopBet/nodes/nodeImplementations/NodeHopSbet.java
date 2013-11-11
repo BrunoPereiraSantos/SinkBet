@@ -176,12 +176,36 @@ public class NodeHopSbet extends Node {
 			return;
 		}
 		
-		if(message.getnHop() == this.ID){
+		//sem agregacao, somente encaminha os eventos
+		/*if(message.getnHop() == this.ID){
 			this.setColor(Color.WHITE);
 			message.setnHop(nextHop);
 			message.setPreviousHop(this.ID);
 			FwdPackEventHopSbet fpe = new FwdPackEventHopSbet(message);
 			fpe.startRelative(1, this);
+		}*/
+		
+		if((!isInAggregation()) && (message.getnHop() == this.ID)){
+			System.out.println(this.ID+" em agregacao");
+			setInAggregation(true);
+			
+			message.setnHop(nextHop);
+			message.setPreviousHop(this.ID);
+			FwdPackEventHopSbet fpe = new FwdPackEventHopSbet(message);
+			fpe.startRelative(getIntervalAggr(), this); // intervalo de agregacao definido no arq de configuracao
+			
+			
+		}else if(message.getnHop() == this.ID){
+			
+			System.out.println(this.ID+" agregou + 1");
+			//mensagens recebidas durante o processo de 
+			//agregacao, sao 'agrupadas' e encaminha-se
+			//somente um pacote
+			message = null;
+			
+			//ESTATISTICA
+			setCount_all_msg_aggr(getCount_all_msg_aggr() + 1);
+			
 		}
 		
 	}
@@ -194,6 +218,10 @@ public class NodeHopSbet extends Node {
 	}
 	
 	public void broadcastEvent(PackEventHopSbet message){
+		System.out.println(this.ID+" emitiu um event");
+		
+		setInAggregation(false); // toda vez que um nodo encaminha ele nao esta em agregacao
+		
 		send(message, Tools.getNodeByID(nextHop));
 		
 		Iterator<Edge> it = this.outgoingConnections.iterator();
@@ -204,8 +232,18 @@ public class NodeHopSbet extends Node {
 				//neste caso sempre os vizinhos escutam.
 				//Nao necessito enviar para todos os vizinhos
 				//pq vou receber um ack para cada perda
-				energySpentByEvent += cr;	
-				energySpentTotal += cr;
+				/*energySpentByEvent += cr;	
+				energySpentTotal += cr;*/
+				
+				//neste caso considera-se a qualidade do link
+				//para que os visinhos recebam a mensagem
+				//e consequentemente gastem energia
+				int p = gerador.nextInt(100);
+				if(100 - getEtxToNode(e.endNode.ID) < p){
+					energySpentByEvent += cr;	
+					energySpentTotal += cr;
+				}
+					
 			}
 		}
 		
@@ -759,8 +797,11 @@ public class NodeHopSbet extends Node {
 
 	@NodePopupMethod(menuText = "Enviar teste")
 	public void enviarTest() {
-		FwdPackEventHopSbet ee = new FwdPackEventHopSbet(new PackEventHopSbet(this.ID, sinkID, nextHop, this.ID));
-		ee.startRelative(1, this);
+		/*FwdPackEventHopSbet ee = new FwdPackEventHopSbet(new PackEventHopSbet(this.ID, sinkID, nextHop, this.ID));
+		ee.startRelative(1, this);*/
+		StartEventHopSbet se = new StartEventHopSbet();
+		se.startRelative(1, this);
+		
 	}
 
 //	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {

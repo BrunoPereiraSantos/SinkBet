@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 $numRounds = 3500; # number of rounds to perform per simulation
-$numNodes=500; # number of nodes
+$numNodes=200; # number of nodes
 $numExec=5;
 $EV=50;
 $intervalAggr=10;
@@ -10,7 +10,7 @@ $dimY=200;
 $rMax=30;
 
 for(;$numNodes<=800; $numNodes+=300){
-  for($id=1; $id<10; $id+=1){
+  for($id=0; $id<10; $id+=1){
     for($i=0 ; $i<$numExec; $i+=1) {
       system("./sinalgo " .
       "-batch ".

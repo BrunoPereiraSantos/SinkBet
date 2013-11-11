@@ -156,6 +156,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		str += " "+NodeEtxBet.getCount_all_overhead();
 		str += " "+qntBroadcastEv;
 		str += " " + NodeEtxBet.getCount_all_ev_sent();
+		str += " " + NodeEtxBet.getCount_all_msg_aggr();
 		//str += " PktAggr=" + NodeEtxBet.getCount_all_msg_aggr();
 		//str += " " + (NodeEtxBet.getCount_all_ev_sent() - NodeEtxBet.getCount_rcv_ev_sink());
 		str += " " + NodeEtxBet.getIntervalAggr();

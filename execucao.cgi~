@@ -2,7 +2,7 @@
 
 $numRounds = 3500; # number of rounds to perform per simulation
 $numNodes=200; # number of nodes
-$numExec=5;
+$numExec=2;
 $EV=50;
 $intervalAggr=10;
 $dimX=200;
@@ -10,7 +10,7 @@ $dimY=200;
 $rMax=30;
 
 for(;$numNodes<=800; $numNodes+=300){
-  for($id=1; $id<10; $id+=1){
+  for($id=0; $id<10; $id+=1){
     for($i=0 ; $i<$numExec; $i+=1) {
       system("./sinalgo " .
       "-batch ".
