@@ -146,7 +146,8 @@
 		<DefaultMobilityModel value="NoMobility" />
 
 		<!--Default reliability model used when none is specified-->
-		<DefaultReliabilityModel value="hopBet:ReliabilityHopSbet" />
+		<!-- <DefaultReliabilityModel value="hopBet:ReliabilityHopSbet" /> -->
+		<DefaultReliabilityModel value="ReliableDelivery" />
 
 		<!--Default node implementation used when none is specified-->
 		<DefaultNodeImplementation value="hopBet:NodeHopSbet" />

@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import projects.etxBet.nodes.timers.StartEventEtxBet;
 import projects.hopBet.nodes.edges.EdgeWeightHopSbet;
 import projects.hopBet.nodes.messages.PackAckHopSbet;
 import projects.hopBet.nodes.messages.PackEventHopSbet;
@@ -693,6 +694,12 @@ public class NodeHopSbet extends Node {
 				timeEvent += 1000;
 				System.out.println(this.ID+" emitiriar evento em: "+timeEvent);
 				se.startRelative(timeEvent, this);
+				
+				for(int i = 0; i < 9; i++){
+					se = new StartEventHopSbet();
+					timeEvent += 11;
+					se.startRelative(timeEvent, this);
+				}
 				
 	//			for(int i = 10; i < 300; i+=10){
 	//				se = new StartEvent();

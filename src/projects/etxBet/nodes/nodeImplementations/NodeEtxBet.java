@@ -473,7 +473,7 @@ public class NodeEtxBet extends Node {
 		}
 		
 		// Uma mensagem foi recebida pelos ancestrais logo devo analisar se e o meu nextHop
-		if (message.getETX() + etxToNode < getEtxPath()){	
+		if (message.getETX() + etxToNode <= getEtxPath()){	
 			if (message.getsBet() > getNeighborMaxSBet()) {
 				//System.out.println("Antes\n"+this);
 				setNeighborMaxSBet(message.getsBet());
@@ -727,6 +727,12 @@ public class NodeEtxBet extends Node {
 				timeEvent += 1000;
 				System.out.println(this.ID+" emitiriar evento em: "+timeEvent);
 				se.startRelative(timeEvent, this);
+				
+				for(int i = 0; i < 9; i++){
+					se = new StartEventEtxBet();
+					timeEvent += 11;
+					se.startRelative(timeEvent, this);
+				}
 				
 	//			for(int i = 10; i < 300; i+=10){
 	//				se = new StartEvent();

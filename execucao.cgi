@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 $numRounds = 3500; # number of rounds to perform per simulation
-$numNodes=200; # number of nodes
-$numExec=5;
+$numNodes=500; # number of nodes
+$numExec=1;
 $EV=50;
 $intervalAggr=10;
 $dimX=200;

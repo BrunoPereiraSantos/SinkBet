@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sinalgo>
-	<ProjectSelector windowWidth="600" windowHeight="400" lastChosenProject="hopBet" windowPosX="54" windowPosY="162" isMaximized="false" selectedTab="1" />
-	<GUI windowWidth="685" windowHeight="715" windowPosX="685" windowPosY="80" isMaximized="false" ControlPanelExpandSimulation="true" ControlPanelShowFullViewPanel="true" ControlPanelShowTextPanel="true" ControlPanelShowProjectControl="true" RunOperationIsLimited="true" helpWindowWidth="500" helpWindowHeight="500" helpWindowPosX="200" helpWindowPosY="200" helpWindowIsMaximized="false" />
-	<RandomSeed seedFromPreviousRun="8093012434829815964" />
-	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="true" updateCheckTimeStamp="1384118749002" runCmdLineArgs="-batch -project hopBet -gen 800 hopBet:NodeHopSbet hopBet:ReadTopology -rounds 3500 UDG -overwrite UDG/rMax=30 NumberNodes=800 EV=50 intervalAggr=10 dimX=200 dimY=200 idTopology=9 " />
-	<GenNodesDlg numNodes="9" />
+	<ProjectSelector windowWidth="600" windowHeight="400" lastChosenProject="wsn" windowPosX="0" windowPosY="24" isMaximized="true" selectedTab="2" />
+	<GUI windowWidth="675" windowHeight="685" windowPosX="505" windowPosY="139" isMaximized="false" ControlPanelExpandSimulation="true" ControlPanelShowFullViewPanel="true" ControlPanelShowTextPanel="true" ControlPanelShowProjectControl="true" RunOperationIsLimited="true" helpWindowWidth="480" helpWindowHeight="440" helpWindowPosX="202" helpWindowPosY="256" helpWindowIsMaximized="false" />
+	<RandomSeed seedFromPreviousRun="-1301161772451437613" />
+	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="true" updateCheckTimeStamp="1385843231583" runCmdLineArgs="" />
+	<GenNodesDlg numNodes="3" />
 </sinalgo>
 

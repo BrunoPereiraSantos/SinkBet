@@ -147,8 +147,8 @@
 		<DefaultMobilityModel value="NoMobility" />
 
 		<!--Default reliability model used when none is specified-->
-		<!-- <DefaultReliabilityModel value="ReliableDelivery" /> -->
-		<DefaultReliabilityModel value="etxBet:ReliabilityEtxBet" />
+		<DefaultReliabilityModel value="ReliableDelivery" /> 
+		<!--<DefaultReliabilityModel value="etxBet:ReliabilityEtxBet" />-->
 		
 
 		<!--Default node implementation used when none is specified-->
